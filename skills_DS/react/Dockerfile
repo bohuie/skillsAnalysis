@@ -1,17 +1,19 @@
 FROM node
 
-RUN npm install webpack -g
-
 WORKDIR /tmp
 COPY package.json /tmp/
-RUN npm config set registry http://registry.npmjs.org/ && npm install
+ENV NODE_ENV=development
+RUN npm install
+
+WORKDIR /app
+COPY package.json /app/
+ENV NODE_ENV=development
+RUN npm install
+RUN npm install -D webpack-cli
+RUN npm install -D webpack
+ENV PATH=/app/node_modules/.bin:$PATH
 
 WORKDIR /app/react/
 COPY . /app/react/
-RUN cp -a /tmp/node_modules /app/react/
-RUN npm install -D webpack-cli
 
-RUN webpack
-
-ENV NODE_ENV=development
-ENV PORT=4000
+RUN npx webpack
