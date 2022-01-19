@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'skills_DS.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'skills_analysis',
         'USER': 'postgres',
         'PASSWORD': 'example',
         'HOST': 'postgres',
