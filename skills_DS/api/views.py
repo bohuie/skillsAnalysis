@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers import FileUploadParser, MultiPartParser
+from rest_framework.parsers import FileUploadParser
 
 # Create your views here.
 class AnswersView(APIView):
@@ -15,12 +15,9 @@ class AnswersView(APIView):
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
 		
 class FileUploadView(APIView):
-	# parser_classes = (FileUploadParser,)
-
 	parser_classes = (FileUploadParser,)
 
 	def post(self, request, format=None):
-		# print(request.FILES)
 		file_obj = request.data['file']
 		# do something with the file
 		if(file_obj):
