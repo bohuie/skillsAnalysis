@@ -3,6 +3,7 @@ import ReactDOM from "react-dom"
 import {BrowserRouter, Routes, Route} from "react-router-dom"
 import App from "./components/App"
 import Questions from "./components/Questions"
+import Upload from "./components/Upload"
 
 ReactDOM.render(
   <React.StrictMode>
@@ -10,6 +11,7 @@ ReactDOM.render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/questions" element={<Questions />} />
+        <Route path="/upload" element={<Upload />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
