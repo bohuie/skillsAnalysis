@@ -1,15 +1,32 @@
-To run the project,
+## Instructions
+A docker-compose file is provided to run the entire tech stack with Docker. This includes Django, React as well as PostgreSQL.
 
-cd into skills_DS
+### First time setup
+If you are running the project for the first time, a few setup steps need to be perform first. To start, you will need to have `docker` as well as `docker-compose` installed on your system. If you are using Windows, it is highly recommended that you install `Docker Desktop` directly.
 
-Create a python virtual environment and activate it.
+After Docker is installed, we'll need to build the docker images for the project, to do so, open a console ad cd into the root directory of the project, then execute:
+```console
+docker-compose build
+```
+to build all necessary images. This will take ~3min but might take longer depends on network speed.
 
-Run `pip install -r requirements.txt`
+After that, in the same console window, execute:
+```console
+docker-compose up
+```
+to start all Docker containers. There **WILL** be errors. Ignore them for now. After all containers has been started and initialize, open Docker Desktop and navigate to `Containers/Apps -> skillsanalysis -> django  -> CLI`. A console window will show up. In it, execute:
+```console
+python manage.py migrate
+```
+This will initialize the database. After this is done, close the console window for Django. In the original console window where you started Docker, use `ctrl+c` to stop all of them.
 
-Run `python manage.py runserver` to start the django project
+The setup is now complete.
 
-In a new terminal, cd into skills_DS/react
+### Running the tech stack
+After the setup, running the tech stack should be simple. Simply execute:
+```console
+docker-compose up
+```
+to start all containers. Then navigate to `localhost:8000` to view the webpage.
 
-Run `npm install`
-
-Run `npm start` to build the react files
+**Note: If you at any point added or removed any dependencies from React or Django, you will have to re-build the docker images. Follow the First time setup guide on how to build the images. If Django model is modified, you will have to re-initialize the database as well.**
