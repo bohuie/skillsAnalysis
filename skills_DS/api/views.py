@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 from .job_scraping import get_jobs
 
 # Create your views here.
@@ -17,6 +18,8 @@ class AnswersView(APIView):
 
 
 class GetJobsView(APIView):
+	permission_classes = [IsAdminUser]
+
 	def post(self, request, format=None):
 		position = request.data['position']
 		location = request.data['location']
