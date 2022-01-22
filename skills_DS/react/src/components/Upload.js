@@ -36,7 +36,9 @@ const Upload = () => {
     };
 
     return (
-        <div>
+        <div style={{
+            marginTop: "2vh",
+          }}>
             <input type="file" name="file" onChange={changeHandler} />
             {selectedFile ? (
                 <div>
