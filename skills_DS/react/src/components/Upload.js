@@ -37,7 +37,7 @@ const Upload = () => {
     return (
         <div>
             <h2>Upload resume in pdf format</h2>
-            <input type="file" name="file" onChange={changeHandler} />
+            <input type="file" name="file" onChange={changeHandler} accept="application/pdf" />
             {selectedFile ? (
                 <div>
                     <button onClick={handleSubmission}>Submit</button>
