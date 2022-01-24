@@ -13,39 +13,37 @@ const Upload = () => {
 
     const handleSubmission = () => {
 
-        try{
+        try {
 
-            if(!isFilePicked) return alert('File is not picked!')
-            if(selectedFile.type !== 'application/pdf') return alert('File is not pdf!');
-    
+            if (!isFilePicked) return alert('File is not picked!')
+            if (selectedFile.type !== 'application/pdf') return alert('File is not pdf!');
+
             const file = new FormData();
-            
+
             console.log(selectedFile);
 
-            // formData.append('filename', selectedFile.name);
             file.append('file', selectedFile);
-            
-            axios.post("/api/fileupload", {file}, {headers: {"X-CSRFTOKEN": Cookies.get('csrftoken'), "Content-Disposition": `attachment; filename=${selectedFile.name}`}})
-            .then(res => {
-                console.log(res.data);
-            })
 
-        } catch(err) {
+            axios.post("/api/fileupload", { file }, { headers: { "X-CSRFTOKEN": Cookies.get('csrftoken'), "Content-Disposition": `attachment; filename=${selectedFile.name}` } })
+                .then(res => {
+                    console.log(res.data);
+                })
+
+        } catch (err) {
             console.error(err);
         }
     };
 
     return (
-        <div style={{
-            marginTop: "2vh",
-          }}>
+        <div>
+            <h2>Upload resume in pdf format</h2>
             <input type="file" name="file" onChange={changeHandler} />
             {selectedFile ? (
                 <div>
                     <button onClick={handleSubmission}>Submit</button>
                 </div>
             ) : (
-                <p>Select a file to show details</p>
+                <p>Select a pdf file to continue</p>
             )}
         </div>
     )
