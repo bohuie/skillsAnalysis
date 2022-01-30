@@ -139,3 +139,13 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 LOGIN_REDIRECT_URL = "/questions"
 
 AUTH_USER_MODEL = 'base.User'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST ='smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'cosc448atesting@gmail.com'
+EMAIL_HOST_PASSWORD = 'Perbuj-4vitpu-jovgyc'
+
+RECAPTCHA_PUBLIC_KEY = '6LdO6TkeAAAAAAK8gAAuMW0QiCIok1D7nDLtvehg'
+RECAPTCHA_PRIVATE_KEY = '6LdO6TkeAAAAAOxoWMUaB3b2yraNhi2BMEwSDXgl'
