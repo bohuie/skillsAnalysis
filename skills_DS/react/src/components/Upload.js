@@ -28,9 +28,10 @@ const Upload = () => {
                 .then(res => {
                     console.log(res.data);
                 })
+                .catch(() => alert("You have to log in first!"))
 
         } catch (err) {
-            console.error(err);
+            console.log(err);
         }
     };
 

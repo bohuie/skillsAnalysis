@@ -22,8 +22,11 @@ class FileUploadView(APIView):
 		file_obj = request.FILES['file']
 		# do something with the file
 		if(file_obj):
-			fs = FileSystemStorage()
-			fs.save(request.user.get_full_name().replace(" ", "_") + ".pdf", file_obj)
+			try:
+				fs = FileSystemStorage()
+				fs.save(request.user.get_full_name().replace(" ", "_") + ".pdf", file_obj)
+			except:
+				return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
 			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 		else:
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
