@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from . import forms
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
+from .forms import MyAuthenticationForm
 
 # Create your views here.
 def register(request):
@@ -15,4 +17,7 @@ def register(request):
     else:
         form = forms.UserRegisterForm()
     return render(request, 'base/register.html', {'form': form})
+
+class MyLoginView(LoginView):
+    form_class = MyAuthenticationForm
 
