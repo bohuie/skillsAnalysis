@@ -8,6 +8,12 @@ from rest_framework.parsers import FileUploadParser
 class AnswersView(APIView):
 	def post(self, request, format=None):
 		if request.data:
+			
+			request.session['age'] = request.data['age']
+			request.session['gender'] = request.data['gender']
+			request.session['yearOfStudy'] = request.data['yearOfStudy']
+			
+			
 			print(request.data['age'], request.data['gender'], request.data['yearOfStudy'])
 			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 		else:

@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -48,3 +49,13 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+class Profile(models.Model):
+    user = models.OneToOneField(User,null=True,on_delete=models.CASCADE)
+    age = models.IntegerField(null=True)
+    gender = models.CharField(max_length=20)
+    yearOfStudy = models.IntegerField(null=True)
+    skills = models.TextField(max_length=100)
+
+    def __str__(self):
+        return f'{self.user.first_name} Profile'
