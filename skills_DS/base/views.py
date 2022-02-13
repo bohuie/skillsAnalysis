@@ -3,6 +3,7 @@ from . import forms
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from .forms import MyAuthenticationForm
+from .models import Profile
 
 # Create your views here.
 def register(request):
@@ -22,8 +23,6 @@ class MyLoginView(LoginView):
     form_class = MyAuthenticationForm
 
 
-def Profile(request):
-    age = request.session.get('age')
-    gender = request.session.get('gender')
-    yearOfStudy = request.session.get('yearOfStudy')
-    return render(request,"base/profile.html",{'age':age,'gender':gender,'yearOfStudy':yearOfStudy})
+def user_profile(request):
+    profile = Profile.objects.filter(user=request.user)
+    return render(request,"base/profile.html",{"profile":profile})

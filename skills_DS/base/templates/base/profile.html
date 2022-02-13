@@ -2,9 +2,10 @@
 {% load crispy_forms_tags %} 
 {% block content %}
 
-<p>age : {{age}}</p>
-<p>gender : {{gender}}</p>
-<p>yearOfStudy : {{yearOfStudy}}</p>
-
-
+{% for x in profile%}
+<p>{{ x.user }}</p>
+<p>{{ x.age }}</p>
+<p>{{ x.gender }}</p>
+<p>{{ x.yearOfStudy }}</p>
+{% endfor %}
 {% endblock content %}

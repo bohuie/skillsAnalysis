@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from base.models import Profile
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,13 +8,8 @@ from rest_framework.parsers import FileUploadParser
 # Create your views here.
 class AnswersView(APIView):
 	def post(self, request, format=None):
-		if request.data:
-			
-			request.session['age'] = request.data['age']
-			request.session['gender'] = request.data['gender']
-			request.session['yearOfStudy'] = request.data['yearOfStudy']
-			
-			
+		if request.data:		
+			profile = Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
 			print(request.data['age'], request.data['gender'], request.data['yearOfStudy'])
 			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 		else:

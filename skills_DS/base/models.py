@@ -51,11 +51,14 @@ class User(AbstractUser):
         return self.email
 
 class Profile(models.Model):
-    user = models.OneToOneField(User,null=True,on_delete=models.CASCADE)
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
     age = models.IntegerField(null=True)
     gender = models.CharField(max_length=20)
     yearOfStudy = models.IntegerField(null=True)
-    skills = models.TextField(max_length=100)
+    skills = models.TextField()
 
+   
     def __str__(self):
-        return f'{self.user.first_name} Profile'
+        return f'{self.user.first_name} {self.user.last_name}'
+    
+    
