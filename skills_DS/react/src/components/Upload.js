@@ -69,7 +69,8 @@ const Upload = () => {
                     <div
                         style={{
                             border: '1px solid rgba(0, 0, 0, 0.3)',
-                            height: '100%',
+                            width: '400px',
+                            height: '450px',
                         }}
                     >
                         <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.12.313/build/pdf.worker.min.js">
