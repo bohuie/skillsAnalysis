@@ -51,9 +51,8 @@ class FileUploadView(APIView):
 		logging.debug("Parsing...")
 		with open(os.devnull, "w") as f, contextlib.redirect_stdout(f):
 			data = resumeparse.read_file(path)
-		logging.debug("Skills: " + str(data['skills']))
 		logging.debug("Full parsed data: " + str(data))
-
+		logging.debug("Skills Json Encoded: " + json.dumps(data['skills']))
 class CheckUserView(APIView):
 	def get(self, request, format=None):
 		if request.user.is_authenticated:
