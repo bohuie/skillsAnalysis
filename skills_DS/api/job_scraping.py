@@ -1,20 +1,19 @@
-from datetime import datetime
-from email import header
-from unicodedata import name
 import requests
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
 from bs4 import BeautifulSoup
 from .models import Location, JobPosting, JobTitle
 
-def get_jobs(position, location, num):
-    main(position, location, num)
-	#asyncio.create_task(main(position, location, num))
+def get_jobs(position, location, num, country, remote):
+    main(position, location, num, country, remote)
     return
 
 
-def get_url(position,location):
-    return f'https://ca.indeed.com/jobs?q={position}&l={location}&radius=0'
+def get_url(position,location, country):
+    if country == "CA":
+        return f'https://ca.indeed.com/jobs?q={position}&l={location}&radius=0'
+    else:
+        return f'https://indeed.com/jobs?q={position}&l={location}&radius=0'
 
 def get_record(page):
     card = BeautifulSoup(page, 'html.parser')
@@ -44,9 +43,9 @@ def get_record(page):
     return (job_title, company, isRemote, description)
 
 
-def main(position, location, num):
+def main(position, location, num, country, remote):
     records = []
-    url = get_url(position, location)
+    url = get_url(position, location['name'], country)
     i = 0
     while num > i:
         urls = []
@@ -58,13 +57,15 @@ def main(position, location, num):
         for card in cards:
             if i >= num: break
             if type(card.find('div', 'companyLocation'))!=type(None):
-                job_location = card.find('div', 'companyLocation').text
+                job_location = card.find('div', 'companyLocation').text.lower()
             else:
                 job_location=''
-            temp_Location = job_location.split(',')[0].lower()
+            if remote == "none" and "remote" in job_location:
+                continue
+            temp_Location = job_location.split(',')[0]
             print(temp_Location)
             
-            if(temp_Location==location.lower() or temp_Location=='canada'):
+            if(temp_Location==location['name'].split(" ")[0].lower()):
                 print('https://ca.indeed.com' + card.get('href'))
                 if(card.get('href') is not None):
                     urls.append('https://ca.indeed.com' + card.get('href'))
@@ -89,18 +90,13 @@ def main(position, location, num):
 
     print(f"Successfully scraped {len(records)} jobs.")
 
-    loc = Location.objects.filter(name=location.lower())[0]
+    loc, created = Location.objects.get_or_create(name=location['name'].lower(), lat=location['lat'], lng=location['lng'])
 
-    if not loc:
-        loc = Location.objects.create(name=location.lower())
+    title, created = JobTitle.objects.get_or_create(name=position.lower())
     
-    title = JobTitle.objects.filter(name=position)[0]
-    
-    if not title:
-        title = JobTitle.objects.create(name=position)
-
     for record in records:
-        JobPosting.objects.get_or_create(title=record[0], company=record[1], is_remote=record[2], description=record[3], location=loc, job_title=title)
+        obj, created = JobPosting.objects.get_or_create(title=record[0], company=record[1], is_remote=record[2], description=record[3], location=loc, job_title=title)
+
 
 
 

@@ -4,6 +4,7 @@ import {BrowserRouter, Routes, Route} from "react-router-dom"
 import App from "./components/App"
 import Questions from "./components/Questions"
 import GetSkills from "./components/admin/GetSkills"
+import BrowseSkills from "./components/admin/BrowseSkills"
 
 ReactDOM.render(
   <React.StrictMode>
@@ -12,6 +13,7 @@ ReactDOM.render(
         <Route path="/" element={<App />} />
         <Route path="/admin/skills" element={<GetSkills />} />
         <Route path="/questions" element={<Questions />} />
+        <Route path="/admin/browse-skills" element={<BrowseSkills />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

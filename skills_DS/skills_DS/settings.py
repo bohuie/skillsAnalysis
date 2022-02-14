@@ -31,7 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'base.apps.CustomAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -40,6 +39,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'api.apps.ApiConfig',
     'base.apps.BaseConfig',
+    'base.apps.CustomAdminConfig',
     'react.apps.ReactConfig'
 ]
 
