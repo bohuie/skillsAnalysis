@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers import FileUploadParser
+from rest_framework.parsers import MultiPartParser
 from django.core.files.storage import FileSystemStorage
 from datetime import datetime
 import hashlib
@@ -18,7 +18,7 @@ class AnswersView(APIView):
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
 		
 class FileUploadView(APIView):
-	parser_classes = (FileUploadParser,)
+	parser_classes = (MultiPartParser,)
 
 	def post(self, request, format=None):
 		file_obj = request.FILES['file']

@@ -89,14 +89,22 @@ const Upload = () => {
                 </div>
             )}
             {buttonClicked ? (
-                <div className="alert alert-success alert-dismissible" style={{
-                    marginTop: "10px",
+                <div className="wrapper" style={{
+                    position: 'fixed',
+                    top: '0',
+                    left: '0',
+                    width: '100%',
+                    zIndex: '99',
                 }}>
-                    <button type="button" className="close" onClick={() => { setButtonClicked(false) }}>&times;</button>
-                    <strong>Success!</strong> Your file has been uploaded.
+                    <div className="alert alert-success alert-dismissible" style={{
+                    }}>
+                        <button type="button" className="close" onClick={() => { setButtonClicked(false) }}>&times;</button>
+                        <strong>Success!</strong> Your file has been uploaded.
+                    </div>
                 </div>
             ) : (
                 <div></div>
+
             )}
         </div>
     )
