@@ -15,6 +15,12 @@ import hashlib
 from django.core.mail import EmailMessage
 from django.urls import reverse
 
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login
+from django.contrib.auth import authenticate
+from skills_DS.settings import EMAIL_HOST_USER
+from django.shortcuts import get_object_or_404
+
 # Create your views here.
 
 
@@ -37,15 +43,61 @@ def register(request):
                 'token': token_generator.make_token(user),
             })
             to_email = form.cleaned_data.get('email')
-            send_mail(mail_subject, message, 'cosc448atesting@gmail.com', [to_email])
+            send_mail(mail_subject, message, EMAIL_HOST_USER, [to_email])
 
             first_name = form.cleaned_data.get('first_name')
-            messages.success(
+            messages.warning(
                 request, f'Welcome {first_name}! Your account has successfully been created. Please verify your account through email.')
             return redirect('login')
     else:
         form = forms.UserRegisterForm()
     return render(request, 'base/register.html', {'form': form})
+
+def _login(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request.POST)
+        username = request.POST['username']
+        password = request.POST['password']
+        User = get_user_model()
+        try:
+            user = get_object_or_404(User, email=username)
+        except:
+            messages.error(request, 'Email or password not correct!')
+            return render(request, 'base/login.html', {'form': form})
+        # user = User.objects.get(email=username)
+        if user is not None:
+            userAuth = authenticate(username=username, password=password)
+            
+            if not user.is_active:
+                current_site = get_current_site(request)
+                mail_subject = 'Activate your account.'
+
+                message = render_to_string('base/email_template.html', {
+                    'user': user,
+                    'domain': current_site.domain,
+                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                    'token': token_generator.make_token(user),
+                })
+                to_email = username
+                send_mail(mail_subject, message, EMAIL_HOST_USER, [to_email])
+
+                messages.warning(request, 'We have resent a verification email. Please verify your account to login.')
+                return redirect('login')
+
+            if userAuth:
+                login(request, user)
+                return redirect('/upload')
+            else:      
+                messages.error(request, 'Email or password not correct!')
+                return render(request, 'base/login.html', {'form': form})
+
+
+        else:
+            messages.error(request, 'Email or password not correct!')
+            return render(request, 'base/login.html', {'form': form})
+    else:
+        form = AuthenticationForm()
+    return render(request, 'base/login.html', {'form': form})
 
 def activate(request, uidb64, token):
     User = get_user_model()
