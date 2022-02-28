@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from base.models import Profile
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -17,8 +18,11 @@ import os
 # Create your views here.
 class AnswersView(APIView):
 	def post(self, request, format=None):
-		if request.data:
-			print(request.data['age'], request.data['gender'], request.data['yearOfStudy'])
+		if request.data:		
+			if Profile.objects.filter(user = request.user).exists():
+				Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
+			else:
+				Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
 			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 		else:
 			print(request.data)
@@ -53,6 +57,7 @@ class FileUploadView(APIView):
 			data = resumeparse.read_file(path)
 		logging.debug("Full parsed data: " + str(data))
 		logging.debug("Skills Json Encoded: " + json.dumps(data['skills']))
+		
 class CheckUserView(APIView):
 	def get(self, request, format=None):
 		if request.user.is_authenticated:
