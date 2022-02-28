@@ -51,7 +51,7 @@ class User(AbstractUser):
         return self.email
 
 class Profile(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.OneToOneField(User,on_delete=models.CASCADE, related_name="profile")
     age = models.IntegerField(null=True)
     gender = models.CharField(max_length=20)
     yearOfStudy = models.IntegerField(null=True)

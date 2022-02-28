@@ -6,6 +6,7 @@ urlpatterns = [
     path('register/', views.register, name="register"),
     path('profile/', views.user_profile, name="user_profile"),
     path('login/', views.MyLoginView.as_view(template_name="base/login.html"), name="login"),
+    path('login-redirect/', views.login_redirect, name="login_redirect"),
     path('logout/', auth_views.LogoutView.as_view(template_name="base/logout.html"), name="logout"),
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name="base/password_reset.html"), name="password_reset"),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name="base/password_reset_done.html"), name="password_reset_done"),

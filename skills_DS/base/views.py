@@ -3,7 +3,6 @@ from . import forms
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from .forms import MyAuthenticationForm
-from .models import Profile
 
 # Create your views here.
 def register(request):
@@ -24,5 +23,16 @@ class MyLoginView(LoginView):
 
 
 def user_profile(request):
-    profile = Profile.objects.filter(user=request.user)
-    return render(request,"base/profile.html",{"profile":profile})
+    try:
+        profile = request.user.profile
+        return render(request,"base/profile.html",{"profile":profile})
+    except:
+        return redirect("/questions")
+
+
+def login_redirect(request):
+    try:
+        profile = request.user.profile
+        return redirect("/")
+    except:
+        return redirect("/questions")
