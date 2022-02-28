@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+import django
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,12 +33,15 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
+    'rest_framework',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    'captcha',
     'api.apps.ApiConfig',
     'base.apps.BaseConfig',
     'base.apps.CustomAdminConfig',
@@ -79,6 +84,14 @@ WSGI_APPLICATION = 'skills_DS.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'skills_analysis',
+        'USER': 'postgres',
+        'PASSWORD': 'example',
+        'HOST': 'postgres',
+        'PORT': '5432',
+    },
+    'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
@@ -128,6 +141,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-LOGIN_REDIRECT_URL = "/questions"
+LOGIN_REDIRECT_URL = "/login-redirect/"
 
 AUTH_USER_MODEL = 'base.User'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST ='smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'cosc448atesting@gmail.com'
+EMAIL_HOST_PASSWORD = 'Perbuj-4vitpu-jovgyc'
+
+RECAPTCHA_PUBLIC_KEY = '6LdO6TkeAAAAAAK8gAAuMW0QiCIok1D7nDLtvehg'
+RECAPTCHA_PRIVATE_KEY = '6LdO6TkeAAAAAOxoWMUaB3b2yraNhi2BMEwSDXgl'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'

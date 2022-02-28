@@ -3,16 +3,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.shortcuts import render, redirect
-
+from .models import User, Profile
+from api.models import Location, JobPosting, JobTitle, Skill, InvalidSkill
 
 # Register your models here.
 
-from .models import User
-from api.models import Location, JobPosting, JobTitle, Skill, InvalidSkill
 
 class CustomUserAdmin(admin.ModelAdmin):
 	pass
-
 
 class CustomAdminSite(admin.AdminSite):
 	def get_urls(self):
@@ -30,3 +28,6 @@ custom_admin.register(JobPosting, CustomUserAdmin)
 custom_admin.register(Location, CustomUserAdmin)
 custom_admin.register(JobTitle, CustomUserAdmin)
 custom_admin.register(Skill, CustomUserAdmin)
+
+admin.site.register(Profile)
+

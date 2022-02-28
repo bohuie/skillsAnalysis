@@ -1,4 +1,6 @@
+env
 venv
 skills_DS/venv
 __pycache__/
 secrets.json
+docker/postgresql/data
