@@ -4,16 +4,16 @@ from concurrent.futures import ThreadPoolExecutor
 from bs4 import BeautifulSoup
 from .models import Location, JobPosting, JobTitle
 
-def get_jobs(position, location, num, country, remote):
-    main(position, location, num, country, remote)
+def get_jobs(position, location, num, country, remote, radius):
+    main(position, location, num, country, remote, radius)
     return
 
 
-def get_url(position,location, country):
+def get_url(position,location, country, radius):
     if country == "CA":
-        return f'https://ca.indeed.com/jobs?q={position}&l={location}&radius=0'
+        return f'https://ca.indeed.com/jobs?q={position}&l={location}&radius={radius}'
     else:
-        return f'https://indeed.com/jobs?q={position}&l={location}&radius=0'
+        return f'https://indeed.com/jobs?q={position}&l={location}&radius={radius}'
 
 def get_record(page):
     card = BeautifulSoup(page, 'html.parser')
@@ -43,9 +43,9 @@ def get_record(page):
     return (job_title, company, isRemote, description)
 
 
-def main(position, location, num, country, remote):
+def main(position, location, num, country, remote, radius):
     records = []
-    url = get_url(position, location['name'], country)
+    url = get_url(position, location['name'], country, radius)
     i = 0
     while num > i:
         urls = []

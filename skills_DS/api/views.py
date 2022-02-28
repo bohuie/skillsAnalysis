@@ -29,7 +29,8 @@ class GetJobsView(APIView):
 		country = request.data['country']
 		remote = request.data['remote']
 		num = int(request.data['number'])
-		get_jobs(position, location, num, country, remote)
+		radius = int(request.data['radius'])
+		get_jobs(position, location, num, country, remote, radius)
 		return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 
 
@@ -49,6 +50,7 @@ class GetSkillsView(APIView):
 
 
 class ListSkillsView(ListAPIView):
+	permission_classes = [IsAdminUser]
 	serializer_class = SkillSerializer
 
 	def get_queryset(self):
@@ -56,6 +58,7 @@ class ListSkillsView(ListAPIView):
 
 
 class UpdateSkillsView(APIView):
+	permission_classes = [IsAdminUser]
 	def post(self, request):
 		skills = request.data
 		for skill in skills:
