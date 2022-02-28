@@ -9,8 +9,10 @@ from rest_framework.parsers import FileUploadParser
 class AnswersView(APIView):
 	def post(self, request, format=None):
 		if request.data:		
-			profile = Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
-			print(request.data['age'], request.data['gender'], request.data['yearOfStudy'])
+			if request.user.profile:
+				Profile.objects.filter(user=request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
+			else:
+				Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
 			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 		else:
 			print(request.data)
