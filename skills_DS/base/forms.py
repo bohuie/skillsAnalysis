@@ -11,6 +11,7 @@ class UserRegisterForm(UserCreationForm):
         model = get_user_model()
         fields = ['first_name', 'last_name', 'email', 'password1', 'password2']
 
-class MyAuthenticationForm(AuthenticationForm):
+class UserLoginForm(forms.Form):
+    username = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput())
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox)
-
