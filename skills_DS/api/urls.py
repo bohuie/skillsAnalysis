@@ -7,7 +7,6 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('answers', views.AnswersView.as_view()),
     path('fileupload', views.FileUploadView.as_view()),
-    path('checkUser', views.CheckUserView.as_view()),
 ]
 
 if settings.DEBUG:

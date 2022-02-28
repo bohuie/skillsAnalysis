@@ -34,9 +34,3 @@ class FileUploadView(APIView):
 		else:
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
 
-class CheckUserView(APIView):
-	def get(self, request, format=None):
-		if request.user.is_authenticated:
-			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
-		else:
-			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
