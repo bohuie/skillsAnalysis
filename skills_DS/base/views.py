@@ -24,8 +24,6 @@ from skills_DS.settings import EMAIL_HOST_USER
 from django.shortcuts import get_object_or_404
 
 # Create your views here.
-
-
 def register(request):
     # User = get_user_model()
     if request.method == 'POST':
@@ -90,7 +88,7 @@ def _login(request):
 
                 if userAuth:
                     login(request, user)
-                    return redirect('/upload')
+                    return redirect('/login-redirect/')
                 else:      
                     messages.error(request, 'Email or password not correct!')
                     return render(request, 'base/login.html', {'form': form})
@@ -117,6 +115,20 @@ def activate(request, uidb64, token):
         return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
     else:
         return HttpResponse('Activation link is invalid!')
+
+def user_profile(request):
+    try:
+        profile = request.user.profile
+        return render(request,"base/profile.html",{"profile":profile})
+    except:
+        return redirect("/questions")
+
+def login_redirect(request):
+    try:
+        profile = request.user.profile
+        return redirect("/")
+    except:
+        return redirect("/questions")
 
 class VerificationView(View):
     def get(self, request, uidb64, token):
