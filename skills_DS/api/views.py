@@ -12,8 +12,8 @@ import hashlib
 class AnswersView(APIView):
 	def post(self, request, format=None):
 		if request.data:		
-			if request.user.profile:
-				Profile.objects.filter(user=request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
+			if Profile.objects.filter(user = request.user).exists():
+				Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
 			else:
 				Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
 			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
