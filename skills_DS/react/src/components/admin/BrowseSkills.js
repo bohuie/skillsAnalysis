@@ -34,7 +34,6 @@ const BrowseSkills = props => {
       }
     })
     axios.post("/api/update-skills", data, {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}}).then(({data}) => {
-      console.log(data)
       setSkills(data.new_skills)
       setLoading(false)
     })
@@ -49,37 +48,61 @@ const BrowseSkills = props => {
       ) : (
         <div class="shadow p-3 mb-5 bg-white rounded">
           <form onSubmit={submit}>
-            {skills.map(({name, job_title}, idx) => {
-              let skill = name + ":" + job_title
-              return (
-                <div className="form-inline" key={idx}>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name={skill} id={"good:" + skill} value={"good:" + skill} />
-                    <label class="form-check-label" for={"good:" + skill}>
-                      Valid
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name={skill} id={"invalid:" + skill} value={"invalid:" + skill} />
-                    <label class="form-check-label" for={"invalid:" + skill}>
-                      Invalid
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name={skill} id={"invalid2:" + skill} value={"invalid2:" + skill} />
-                    <label class="form-check-label" for={"invalid2:" + skill}>
-                      Invalid for job
-                    </label>
-                  </div>
-                  <div className="form-check-inline">
-                    <label>Skill: "{name}"</label>
-                  </div>
-                  <div className="form-check-inline">
-                    <label>Job Title: "{job_title}"</label>
-                  </div>
-                </div>
-              )
-            })}
+            <table className="table">
+              <thead>
+                <tr>
+                  <th scope="col">Valid</th>
+                  <th scope="col">Invalid</th>
+                  <th scope="col">Invalid for specific job</th>
+                  <th scope="col">Skill</th>
+                  <th scope="col">Job Title</th>
+                </tr>
+              </thead>
+              <tbody>
+                {skills.map(({name, job_title}, idx) => {
+                  let skill = name + ":" + job_title
+                  return (
+                    <tr key={idx}>
+                      <td>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name={skill} id={"good:" + skill} value={"good:" + skill} />
+                          <label class="form-check-label" for={"good:" + skill}>
+                            Valid
+                          </label>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name={skill} id={"invalid:" + skill} value={"invalid:" + skill} checked />
+                          <label class="form-check-label" for={"invalid:" + skill}>
+                            Invalid
+                          </label>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name={skill} id={"invalid2:" + skill} value={"invalid2:" + skill} />
+                          <label class="form-check-label" for={"invalid2:" + skill}>
+                            Invalid for job
+                          </label>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="form-check-inline">
+                          <label>{name}</label>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="form-check-inline">
+                          <label>{job_title}</label>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
             <button className="btn btn-primary" type="submit">
               Submit
             </button>

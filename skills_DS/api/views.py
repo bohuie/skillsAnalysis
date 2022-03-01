@@ -61,7 +61,7 @@ class ListSkillsView(ListAPIView):
 	serializer_class = SkillSerializer
 
 	def get_queryset(self):
-		return Skill.objects.filter(verified=False)[:50]
+		return Skill.objects.filter(verified=False)[:20]
 
 
 class UpdateSkillsView(APIView):

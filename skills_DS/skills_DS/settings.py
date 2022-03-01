@@ -33,7 +33,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'rest_framework',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -88,7 +87,7 @@ DATABASES = {
         'NAME': 'skills_analysis',
         'USER': 'postgres',
         'PASSWORD': 'example',
-        'HOST': 'postgres',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
     },
     'sqlite': {
