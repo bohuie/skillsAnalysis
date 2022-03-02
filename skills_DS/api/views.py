@@ -87,7 +87,7 @@ class UpdateSkillsView(APIView):
 					InvalidSkill.objects.get_or_create(job_title=job_title, name=skill['skill'], specific=True)
 					query.delete()
 			else:
-				print("could not get skill")
+				return Response({"error": "Could not get skills"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
 		new_skills = Skill.objects.filter(verified=False)[:50]
 		new_skill_list = []
 		for skill in new_skills:

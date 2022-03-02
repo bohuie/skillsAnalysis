@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'skills_analysis',
         'USER': 'postgres',
         'PASSWORD': 'example',
-        'HOST': '127.0.0.1',
+        'HOST': 'postgres',
         'PORT': '5432',
     },
     'sqlite': {
