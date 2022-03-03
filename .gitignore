@@ -3,3 +3,4 @@ venv
 skills_DS/venv
 __pycache__/
 docker/postgresql/data
+skills_DS/media
