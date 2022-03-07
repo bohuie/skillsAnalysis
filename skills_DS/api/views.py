@@ -47,7 +47,6 @@ class GetJobsView(APIView):
 		get_jobs(position, location, num, country, remote, radius)
 		return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 
-
 class GetSkillsView(APIView):
 	permission_classes = [IsAdminUser]
 
@@ -62,6 +61,15 @@ class GetSkillsView(APIView):
 			print(ex)
 			return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
+class GetUserProfileView(APIView):
+	def get(self, request, format=None):
+		if request.user.is_authenticated:
+			if Profile.objects.filter(user = request.user).exists():
+				return Response({'success': Profile.objects.filter(user = request.user).values()[0]}, status=status.HTTP_200_OK)
+			else:
+				return Response({'error': 'User does not have a profile.'}, status=status.HTTP_400_BAD_REQUEST)
+		else:
+			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 class ListSkillsView(ListAPIView):
 	permission_classes = [IsAdminUser]
@@ -69,7 +77,6 @@ class ListSkillsView(ListAPIView):
 
 	def get_queryset(self):
 		return Skill.objects.filter(verified=False)[:20]
-
 
 class UpdateSkillsView(APIView):
 	permission_classes = [IsAdminUser]
