@@ -42,8 +42,12 @@ class FileUploadView(APIView):
 				fs.save(fname, file_obj)
 				fpath = fs.path(fname)
 				logging.debug("Recieved file: " + fpath)
-				t = threading.Thread(target=self.parse_resume_async,args=[fpath])
-				t.start()
+				if Profile.objects.filter(user = request.user).exists():
+					t = threading.Thread(target=self.parse_resume_async,args=[fpath,request])
+					t.start()
+				else:
+					logging.debug("User does not have a profile")
+
 			except Exception as e:
 				print ('%s (%s)' % (e.message, type(e)))
 				return HttpResponse({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
@@ -51,12 +55,16 @@ class FileUploadView(APIView):
 		else:
 			return HttpResponse({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
 
-	def parse_resume_async(v, path):
+	def parse_resume_async(v, path, request):
+		Profile.objects.filter(user = request.user).update(resume_processing = True)
+		
 		logging.debug("Parsing...")
 		with open(os.devnull, "w") as f, contextlib.redirect_stdout(f):
 			data = resumeparse.read_file(path)
 		logging.debug("Full parsed data: " + str(data))
-		logging.debug("Skills Json Encoded: " + json.dumps(data['skills']))
+
+		Profile.objects.filter(user = request.user).update(skills = json.dumps(data['skills']))
+		Profile.objects.filter(user = request.user).update(resume_processing = False)
 		
 class CheckUserView(APIView):
 	def get(self, request, format=None):

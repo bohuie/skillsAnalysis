@@ -22,13 +22,25 @@ const Upload = () => {
 
   const handleSubmission = () => {
     try {
-      const form_data = new FormData()
+      const form_data = new FormData();
 
-      form_data.append("file", selectedFile)
+      form_data.append("file", selectedFile);
 
-      axios.post("/api/fileupload", form_data, {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken"), "Content-Disposition": `attachment; filename=${selectedFile.name}`, "Content-Type": "multipart/form-data"}}).catch()
+      axios.post("/api/fileupload", form_data, {
+        headers: {
+          "X-CSRFTOKEN": Cookies.get("csrftoken"), 
+          "Content-Disposition": `attachment; filename=${selectedFile.name}`, 
+          "Content-Type": "multipart/form-data"
+        }
+      }).then((response) => {
+        setButtonClicked(true);
 
-      setButtonClicked(true)
+        setTimeout(function () {
+          window.location.href = "profile/";
+       }, 5000); 
+
+      }).catch(err => console.error(err));
+
     } catch (err) {}
   }
 
@@ -90,7 +102,7 @@ const Upload = () => {
             >
               &times;
             </button>
-            <strong>Success!</strong> Your file has been uploaded.
+            <strong>Success!</strong> Your file has been uploaded. Please wait while your resume is being processed...
           </div>
         </div>
       ) : (
