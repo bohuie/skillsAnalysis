@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import os
 from pathlib import Path
-import django
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,7 +47,6 @@ LOGGING = {
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'rest_framework',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,6 +57,7 @@ INSTALLED_APPS = [
     'captcha',
     'api.apps.ApiConfig',
     'base.apps.BaseConfig',
+    'base.apps.CustomAdminConfig',
     'react.apps.ReactConfig'
 ]
 
@@ -163,10 +163,16 @@ EMAIL_HOST ='smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'cosc448atesting@gmail.com'
-EMAIL_HOST_PASSWORD = 'Perbuj-4vitpu-jovgyc'
+EMAIL_HOST_PASSWORD = ''
 
 RECAPTCHA_PUBLIC_KEY = '6LdO6TkeAAAAAAK8gAAuMW0QiCIok1D7nDLtvehg'
 RECAPTCHA_PRIVATE_KEY = '6LdO6TkeAAAAAOxoWMUaB3b2yraNhi2BMEwSDXgl'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+MESSAGE_TAGS = {
+        messages.SUCCESS: 'alert-success',
+        messages.WARNING: 'alert-warning',
+        messages.ERROR: 'alert-danger',
+ }

@@ -1,5 +1,6 @@
 import {Fragment, useState, useEffect} from "react"
 import axios from "axios"
+import Cookies from "js-cookie"
 
 const Questions = props => {
   const [age, setAge] = useState(null)
@@ -12,7 +13,7 @@ const Questions = props => {
   const submit = e => {
     e.preventDefault()
     axios
-      .post("/api/answers", {age, gender, yearOfStudy}, {headers: {"X-CSRFTOKEN": getCookie("csrftoken")}})
+      .post("/api/answers", {age, gender, yearOfStudy}, {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}})
       .then(res => {
         console.log(res.data)
         setReceived(true)
@@ -21,22 +22,6 @@ const Questions = props => {
         console.error(err, err?.response, err?.response?.data)
         setError("bad request")
       })
-  }
-
-  function getCookie(name) {
-    let cookieValue = null
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";")
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim()
-        // Does this cookie string begin with the name we want?
-        if (cookie.substring(0, name.length + 1) === name + "=") {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1))
-          break
-        }
-      }
-    }
-    return cookieValue
   }
 
   return (
@@ -58,8 +43,8 @@ const Questions = props => {
               <input type="text" id="q2" autoComplete="off" className="form-control" onChange={e => setGender(e.target.value)} />
             </div>
             <div className="form-group">
-              <label htmlFor="q1">What is your year of study?</label>
-              <input type="text" id="qi" autoComplete="off" className="form-control" onChange={e => setYearOfStudy(e.target.value)} />
+              <label htmlFor="q3">What is your year of study?</label>
+              <input type="text" id="q3" autoComplete="off" className="form-control" onChange={e => setYearOfStudy(e.target.value)} />
             </div>
             <button className="btn btn-primary" type="submit">
               Submit
