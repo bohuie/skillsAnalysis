@@ -71,6 +71,8 @@ def main(position, location, num, country, remote, radius):
                     urls.append('https://ca.indeed.com' + card.get('href'))
                     i+=1
 
+        if len(urls) == 0:
+            raise "Unable to find any jobs" 
         session = FuturesSession(executor=ThreadPoolExecutor(max_workers=len(urls)))
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80 Safari/537.36',

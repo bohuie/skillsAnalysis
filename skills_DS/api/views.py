@@ -22,7 +22,7 @@ class AnswersView(APIView):
 				Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
 			else:
 				Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
-			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
+			return Response({'success': 'success'}, status=status.HTTP_200_OK)
 		else:
 			print(request.data)
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
@@ -37,8 +37,12 @@ class GetJobsView(APIView):
 		remote = request.data['remote']
 		num = int(request.data['number'])
 		radius = int(request.data['radius'])
-		get_jobs(position, location, num, country, remote, radius)
-		return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
+		try:
+			get_jobs(position, location, num, country, remote, radius)
+			return Response({'success': 'success'}, status=status.HTTP_200_OK)
+		except Exception as e:
+			print(str(e))
+			return Response({"error": "Could not get jobs", "message": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class GetSkillsView(APIView):
@@ -107,7 +111,7 @@ class FileUploadView(APIView):
 				fs.save(hashlib.sha256(current_user.email.encode()).hexdigest() + "_" + datetime.now().strftime('%m-%d-%Y_%H-%M-%S') + ".pdf", file_obj)
 			except:
 				return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
-			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
+			return Response({'success': 'it worked'}, status=status.HTTP_200_OK)
 		else:
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
 
