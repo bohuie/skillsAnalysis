@@ -6,6 +6,7 @@ import Questions from "./components/Questions"
 import GetSkills from "./components/admin/GetSkills"
 import BrowseSkills from "./components/admin/BrowseSkills"
 import Upload from "./components/Upload"
+import Profile from "./components/Profile"
 
 ReactDOM.render(
   <React.StrictMode>
@@ -16,6 +17,7 @@ ReactDOM.render(
         <Route path="/questions" element={<Questions />} />
         <Route path="/admin/browse-skills" element={<BrowseSkills />} />
         <Route path="/upload" element={<Upload />} />
+        <Route path="/profile_new" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
