@@ -110,7 +110,7 @@ const Upload = () => {
             >
               &times;
             </button>
-            <strong>Success!</strong> Your file has been uploaded. Please wait while your resume is being processed... &nbsp&nbsp
+            <strong>Success!</strong> Your file has been uploaded. Please wait while your resume is being processed... &nbsp;&nbsp;
             <span class="spinner-border spinner-border-sm text-success" role="status"></span>
           </div>
         </div>
