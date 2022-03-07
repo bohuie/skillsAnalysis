@@ -1,5 +1,13 @@
 version: '3.1'
 services:
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    ports:
+      - 8080:8080
+    networks:
+      - django-network
+      
   postgres:
     image: postgres:latest
     container_name: postgres
