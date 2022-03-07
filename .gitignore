@@ -4,3 +4,4 @@ skills_DS/venv
 __pycache__/
 secrets.json
 docker/postgresql/data
+skills_DS/media
