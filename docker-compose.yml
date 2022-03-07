@@ -7,7 +7,7 @@ services:
       - 8080:8080
     networks:
       - django-network
-      
+
   postgres:
     image: postgres:latest
     container_name: postgres
@@ -22,20 +22,26 @@ services:
       POSTGRES_PASSWORD: example
     networks:
       - django-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   django:
     build: ./skills_DS
     container_name: django
     restart: always
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
-      - 8000:8000 
+      - 8000:8000
     volumes:
       - ./skills_DS:/app/django
     networks:
       - django-network
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    command: [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
 
   react:
     build: ./skills_DS/react
@@ -45,7 +51,7 @@ services:
       - ./skills_DS/react:/app/react
     networks:
       - django-network
-    command: ["npm", "start"]
+    command: [ "npm", "start" ]
 
 networks:
   django-network:
