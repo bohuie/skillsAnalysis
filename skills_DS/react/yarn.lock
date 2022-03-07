@@ -7546,6 +7546,11 @@
   "resolved" "https://registry.npmjs.org/process-nextick-args/-/process-nextick-args-2.0.1.tgz"
   "version" "2.0.1"
 
+"professions@^1.0.2":
+  "integrity" "sha512-IHG77fwGoRAH9G1+zpCRZdbpmX3PS6nKG7J4+5hpo5hkz+/9o9mrZALHSxzfdL/+0OFwCjOPYj+pBli1s6JApw=="
+  "resolved" "https://registry.npmjs.org/professions/-/professions-1.0.2.tgz"
+  "version" "1.0.2"
+
 "progress@^2.0.0":
   "integrity" "sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA=="
   "resolved" "https://registry.npmjs.org/progress/-/progress-2.0.3.tgz"

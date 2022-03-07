@@ -33,7 +33,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'rest_framework',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +43,7 @@ INSTALLED_APPS = [
     'captcha',
     'api.apps.ApiConfig',
     'base.apps.BaseConfig',
+    'base.apps.CustomAdminConfig',
     'react.apps.ReactConfig'
 ]
 

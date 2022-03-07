@@ -1,8 +1,11 @@
+from pipes import Template
 from django.urls import path, include
 from . import views
+from .admin import custom_admin
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
+    path('admin/', custom_admin.urls),
     path('register/', views.register, name="register"),
     path('profile/', views.user_profile, name="user_profile"),
     path('login/', views._login, name="login"),
