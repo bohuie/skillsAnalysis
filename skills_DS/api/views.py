@@ -65,7 +65,10 @@ class GetUserProfileView(APIView):
 	def get(self, request, format=None):
 		if request.user.is_authenticated:
 			if Profile.objects.filter(user = request.user).exists():
-				return Response({'success': Profile.objects.filter(user = request.user).values()[0]}, status=status.HTTP_200_OK)
+				profile = Profile.objects.filter(user = request.user).values()[0]
+				profile["full_name"] = request.user.get_full_name()
+				profile["email"] = request.user.email
+				return Response({'success': profile}, status=status.HTTP_200_OK)
 			else:
 				return Response({'error': 'User does not have a profile.'}, status=status.HTTP_400_BAD_REQUEST)
 		else:

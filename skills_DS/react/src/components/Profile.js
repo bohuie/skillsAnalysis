@@ -5,7 +5,13 @@ import { useState, Fragment, useEffect } from "react"
 const Profile = props => {
     const [error, setError] = useState(null)
     const [skills, setSkills] = useState([])
-    const [profile, setProfile] = useState([])
+    const [profile, setProfile] = useState({
+        full_name: '',
+        email: '',
+        gender: '',
+        age: '',
+        year_of_study: ''
+    })
 
     const handleEdit = (event, id) => {
         const newSkills = [...skills];
@@ -40,7 +46,13 @@ const Profile = props => {
                     setSkills(JSON.parse(data.success.skills).map((skill, index) => (
                         { id: index, value: skill }
                     )));
-                    setProfile(data)
+                    setProfile({
+                        full_name: data.success.full_name,
+                        email: data.success.email,
+                        gender: data.success.gender,
+                        age: data.success.age,
+                        year_of_study: data.success.yearOfStudy
+                    })
                 }
                 else
                     setError("Unable to get data.")
@@ -54,6 +66,34 @@ const Profile = props => {
 
     return (
         <Fragment>
+            <br/>
+            {error ? (
+                <h1 style={{ textAlign: "center" }}>{error}</h1>
+            ) : (
+                <div class="shadow p-3 mb-5 bg-white rounded">
+                    <table className="table">
+                        <tbody>
+                            <tr class="table-borderless">
+                                <td scope="col" colspan="2">
+                                    <h3>
+                                        {"Hello, " + profile.full_name + "!"}
+                                    </h3>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="w-50">{"Email: " + profile.email}</td>
+                                <td class="w-50">{"Gender: " + profile.gender}</td>
+                            </tr>
+
+                            <tr>
+                                <td class="w-50">{"Age: " + profile.age}</td>
+                                <td class="w-50">{"Year of Study: " + profile.year_of_study}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
             {error ? (
                 <h1 style={{ textAlign: "center" }}>{error}</h1>
             ) : (
@@ -70,10 +110,10 @@ const Profile = props => {
                                 {
                                     skills.map((skill) => {
                                         return (
-                                            <tr>
+                                            <tr key={skill.id}>
                                                 <td>
                                                     <div className="form-check w-100">
-                                                        <input type="text" class="form-control" onChange={(event) => handleEdit(event, skill.id)} value={skill.value}></input>
+                                                        <input type="text" class="form-control" onChange={(event) => handleEdit(event, skill.id)} value={skill.value} required></input>
                                                     </div>
                                                 </td>
                                                 <td>
