@@ -1,7 +1,7 @@
-from pipes import Template
-from django.urls import path, include
 from . import views
 from .admin import custom_admin
+
+from django.urls import path, include
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [

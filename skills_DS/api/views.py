@@ -1,25 +1,24 @@
-from django.shortcuts import render
 from base.models import Profile
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from rest_framework.parsers import FileUploadParser, MultiPartParser
+from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAdminUser
 from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
 from datetime import datetime
-import hashlib
 from resume_parser import resumeparse
+from .job_scraping import get_jobs
+from .skills_extraction import extract_skills
+from .serializers import SkillSerializer
+from .models import JobTitle, Skill, InvalidSkill
+import hashlib
 import logging
 import json
 import threading
 import contextlib
 import os
-from rest_framework.permissions import IsAdminUser
-from .job_scraping import get_jobs
-from .skills_extraction import extract_skills
-from .serializers import SkillSerializer
-from .models import JobTitle, Skill, InvalidSkill
 
 # Create your views here.
 class AnswersView(APIView):
