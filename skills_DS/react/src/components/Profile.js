@@ -19,7 +19,7 @@ const Profile = props => {
         setSkills(newSkills);
     }
 
-    const handleDeleteClick = (id) => {
+    const handleDeleteRow = (id) => {
         const newSkills = [...skills];
         const index = newSkills.findIndex((skill) => skill.id === id);
         newSkills.splice(index, 1);
@@ -35,7 +35,9 @@ const Profile = props => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(skills);
+        console.log(skills.map((skill) => (
+            skill = skill.value
+        )));
     }
 
     useEffect(() => {
@@ -70,24 +72,24 @@ const Profile = props => {
             {error ? (
                 <h1 style={{ textAlign: "center" }}>{error}</h1>
             ) : (
-                <div class="shadow p-3 mb-5 bg-white rounded">
+                <div className="shadow p-3 mb-5 bg-white rounded">
                     <table className="table">
                         <tbody>
-                            <tr class="table-borderless">
-                                <td scope="col" colspan="2">
+                            <tr className="table-borderless">
+                                <td scope="col" colSpan="2">
                                     <h3>
                                         {"Hello, " + profile.full_name + "!"}
                                     </h3>
                                 </td>
                             </tr>
                             <tr>
-                                <td class="w-50">{"Email: " + profile.email}</td>
-                                <td class="w-50">{"Gender: " + profile.gender}</td>
+                                <td className="w-50">{"Email: " + profile.email}</td>
+                                <td className="w-50">{"Gender: " + profile.gender}</td>
                             </tr>
 
                             <tr>
-                                <td class="w-50">{"Age: " + profile.age}</td>
-                                <td class="w-50">{"Year of Study: " + profile.year_of_study}</td>
+                                <td className="w-50">{"Age: " + profile.age}</td>
+                                <td className="w-50">{"Year of Study: " + profile.year_of_study}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -97,7 +99,7 @@ const Profile = props => {
             {error ? (
                 <h1 style={{ textAlign: "center" }}>{error}</h1>
             ) : (
-                <div class="shadow p-3 mb-5 bg-white rounded">
+                <div className="shadow p-3 mb-5 bg-white rounded">
                     <form onSubmit={handleSubmit}>
                         <table className="table">
                             <thead>
@@ -113,12 +115,12 @@ const Profile = props => {
                                             <tr key={skill.id}>
                                                 <td>
                                                     <div className="form-check w-100">
-                                                        <input type="text" class="form-control" onChange={(event) => handleEdit(event, skill.id)} value={skill.value} required></input>
+                                                        <input type="text" className="form-control" onChange={(event) => handleEdit(event, skill.id)} value={skill.value} required></input>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="form-check w-100">
-                                                        <button type="button" class="btn btn-danger w-100" onClick={() => handleDeleteClick(skill.id)}>Delete</button>
+                                                    <div className="form-check w-100">
+                                                        <button type="button" className="btn btn-danger w-100" onClick={() => handleDeleteRow(skill.id)}>Delete</button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -128,12 +130,12 @@ const Profile = props => {
                                 <tr>
                                     <td>
                                         <div className="form-check w-100">
-                                            <button type="button" class="btn btn-primary w-100" onClick={handleAddRow}>Add a skill</button>
+                                            <button type="button" className="btn btn-primary w-100" onClick={handleAddRow}>Add a skill</button>
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="form-check w-100">
-                                            <button type="submit" class="btn btn-success w-100">Submit</button>
+                                        <div className="form-check w-100">
+                                            <button type="submit" className="btn btn-success w-100">Submit</button>
                                         </div>
                                     </td>
                                 </tr>
