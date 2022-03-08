@@ -43,6 +43,7 @@ const Profile = props => {
         axios
             .get("/api/get-profile", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
             .then(({ data }) => {
+                console.log(data);
                 if (data.success) {
                     setSkills(JSON.parse(data.success.skills).map((skill, index) => (
                         { id: index, value: skill }
@@ -57,7 +58,6 @@ const Profile = props => {
                 }
                 else
                     setError("Unable to get data.")
-                console.log(data)
             })
             .catch(err => {
                 console.error(err)

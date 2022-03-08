@@ -157,8 +157,10 @@ class FileUploadView(APIView):
 		with open(os.devnull, "w") as f, contextlib.redirect_stdout(f):
 			data = resumeparse.read_file(path)
 		logging.debug("Full parsed data: " + str(data))
-
-		Profile.objects.filter(user = request.user).update(skills = json.dumps(data['skills']))
+		skills = []
+		for skill in data['skills']:
+			skills.append(skill.strip())
+		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
 		Profile.objects.filter(user = request.user).update(resume_processing = False)
 		
 class CheckUserView(APIView):
