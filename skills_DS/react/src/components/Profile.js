@@ -3,15 +3,16 @@ import Cookies from "js-cookie"
 import { useState, Fragment, useEffect } from "react"
 
 const Profile = props => {
-    const [error, setError] = useState(null)
-    const [skills, setSkills] = useState([])
+    const [submitted, setSubmitted] = useState(false);
+    const [error, setError] = useState(null);
+    const [skills, setSkills] = useState([]);
     const [profile, setProfile] = useState({
         full_name: '',
         email: '',
         gender: '',
         age: '',
         year_of_study: ''
-    })
+    });
 
     const handleEdit = (event, id) => {
         const newSkills = [...skills];
@@ -35,9 +36,7 @@ const Profile = props => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log(skills.map((skill) => (
-            skill = skill.value
-        )));
+        axios.post("/api/update-user-skills", skills, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } }).then(setSubmitted(true));
     }
 
     useEffect(() => {
@@ -68,7 +67,7 @@ const Profile = props => {
 
     return (
         <Fragment>
-            <br/>
+            <br />
             {error ? (
                 <h1 style={{ textAlign: "center" }}>{error}</h1>
             ) : (
@@ -145,6 +144,33 @@ const Profile = props => {
                 </div>
             )
             }
+            {submitted ? (
+                <div
+                    className="wrapper"
+                    style={{
+                        position: "fixed",
+                        top: "0",
+                        left: "0",
+                        width: "100%",
+                        zIndex: "99"
+                    }}
+                >
+                    <div className="alert alert-success alert-dismissible" style={{ textAlign: "center" }}>
+                        <button
+                            type="button"
+                            className="close"
+                            onClick={() => {
+                                setSubmitted(false)
+                            }}
+                        >
+                            &times;
+                        </button>
+                        <strong>Success!</strong> Your skills has been updated.
+                    </div>
+                </div>
+            ) : (
+                <div></div>
+            )}
         </Fragment >
     )
 }

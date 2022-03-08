@@ -74,6 +74,18 @@ class GetUserProfileView(APIView):
 		else:
 			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
 
+class UpdateUserSkillsView(APIView):
+	def post(self, request):
+		if request.user.is_authenticated:
+			skills = request.data
+			skills_array = [] 
+			for skill in skills:
+				skills_array.append(skill['value'])
+			Profile.objects.filter(user = request.user).update(skills = json.dumps(skills_array))
+			return Response({"success": "successfully updated skills"}, status=status.HTTP_200_OK)
+		else:
+			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED) 
+
 class ListSkillsView(ListAPIView):
 	permission_classes = [IsAdminUser]
 	serializer_class = SkillSerializer
