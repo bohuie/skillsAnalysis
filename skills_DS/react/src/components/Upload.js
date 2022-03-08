@@ -38,7 +38,7 @@ const Upload = () => {
 
       form_data.append("file", selectedFile);
 
-      axios.post("/api/fileupload", form_data, {
+      axios.post("/api/resume-upload", form_data, {
         headers: {
           "X-CSRFTOKEN": Cookies.get("csrftoken"),
           "Content-Disposition": `attachment; filename=${selectedFile.name}`,

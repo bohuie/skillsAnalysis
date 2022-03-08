@@ -5,7 +5,6 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAdminUser
-from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
 from datetime import datetime
 from resume_parser import resumeparse
@@ -28,10 +27,10 @@ class AnswersView(APIView):
 				Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
 			else:
 				Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
-			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
+			return Response({'success': 'Successfully updated user profile.'}, status=status.HTTP_200_OK)
 		else:
-			print(request.data)
-			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+			logging.debug(request.data)
+			return Response({'error': 'Bad Request.'}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetJobsView(APIView):
 	permission_classes = [IsAdminUser]
@@ -44,7 +43,7 @@ class GetJobsView(APIView):
 		num = int(request.data['number'])
 		radius = int(request.data['radius'])
 		get_jobs(position, location, num, country, remote, radius)
-		return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
+		return Response({'Success': 'Retrieved jobs.'}, status=status.HTTP_200_OK)
 
 class GetSkillsView(APIView):
 	permission_classes = [IsAdminUser]
@@ -55,7 +54,7 @@ class GetSkillsView(APIView):
 		distance = int(request.data['distance'])
 		try:
 			extract_skills(position, location, distance)
-			return Response({"success": "success"}, status=status.HTTP_200_OK)
+			return Response({"success": "Retrieved skills."}, status=status.HTTP_200_OK)
 		except Exception as ex:
 			print(ex)
 			return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
@@ -81,7 +80,7 @@ class UpdateUserSkillsView(APIView):
 			for skill in skills:
 				skills_array.append(skill['value'])
 			Profile.objects.filter(user = request.user).update(skills = json.dumps(skills_array))
-			return Response({"success": "successfully updated skills"}, status=status.HTTP_200_OK)
+			return Response({"success": "Successfully updated skills."}, status=status.HTTP_200_OK)
 		else:
 			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED) 
 
@@ -122,7 +121,7 @@ class UpdateSkillsView(APIView):
 			new_skill_list.append(SkillSerializer(skill).data)
 		return Response({"success": "successfully updated skills", "new_skills": new_skill_list}, status=status.HTTP_200_OK)
 
-class FileUploadView(APIView):
+class ResumeUploadView(APIView):
 	parser_classes = (MultiPartParser,)
 
 	def post(self, request, format=None):
@@ -144,10 +143,10 @@ class FileUploadView(APIView):
 
 			except Exception as e:
 				print ('%s (%s)' % (e.message, type(e)))
-				return HttpResponse({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
-			return HttpResponse({'hey': 'it worked'}, status=status.HTTP_200_OK)
+				return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+			return Response({'success': 'it worked'}, status=status.HTTP_200_OK)
 		else:
-			return HttpResponse({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
 
 	def parse_resume_async(v, path, request):
 		Profile.objects.filter(user = request.user).update(resume_processing = True)
@@ -161,10 +160,3 @@ class FileUploadView(APIView):
 			skills.append(skill.strip())
 		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
 		Profile.objects.filter(user = request.user).update(resume_processing = False)
-		
-class CheckUserView(APIView):
-	def get(self, request, format=None):
-		if request.user.is_authenticated:
-			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
-		else:
-			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)

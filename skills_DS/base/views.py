@@ -2,6 +2,7 @@ from . import forms
 from .forms import UserLoginForm
 from .utils import token_generator
 from base.models import Profile
+from rest_framework.response import Response
 
 from django.views import View
 from django.contrib import messages
@@ -105,13 +106,13 @@ def activate(request, uidb64, token):
     if user is not None and token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+        return Response('Thank you for your email confirmation. Now you can login your account.')
     else:
-        return HttpResponse('Activation link is invalid!')
+        return Response('Activation link is invalid!')
 
 def user_profile(request):
     if Profile.objects.filter(user = request.user).exists():
-        return redirect("/")
+        return redirect("/profile")
     else:
         return redirect("/questions")
 
