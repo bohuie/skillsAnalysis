@@ -24,7 +24,7 @@ const Upload = () => {
     try {
       axios.get("/api/get-profile", {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}}).then((response) => {
         if (!response.data.success.resume_processing) {
-          window.location.href = "profile_new/";
+          window.location.href = "profile/";
         } else {
           setTimeout(checkResumeProcessing, 2000);
         }
