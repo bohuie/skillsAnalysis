@@ -10,8 +10,8 @@ RUN apt install dos2unix default-jdk -y
 
 RUN pip3 install --upgrade pip setuptools wheel
 RUN dos2unix setup.sh migrate.sh
-RUN chmod +X ./setup.sh
-RUN chmod +X ./migrate.sh
+RUN chmod +x ./setup.sh
+RUN chmod +x ./migrate.sh
 
 RUN ./setup.sh
 
