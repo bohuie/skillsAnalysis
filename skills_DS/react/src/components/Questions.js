@@ -36,15 +36,29 @@ const Questions = props => {
           <form onSubmit={submit} style={{width: 400}}>
             <div className="form-group">
               <label htmlFor="q1">What is your age?</label>
-              <input type="text" id="q1" autoComplete="off" className="form-control" onChange={e => setAge(e.target.value)} />
+              <input type="number" id="q1" min="1" max="99" autoComplete="off" className="form-control" onChange={e => setAge(e.target.value)} />
             </div>
             <div className="form-group">
               <label htmlFor="q2">What is your gender?</label>
-              <input type="text" id="q2" autoComplete="off" className="form-control" onChange={e => setGender(e.target.value)} />
+              <select  className="form-control" id="q2" onChange={e => setGender(e.target.value)}>
+                  <option disabled selected value> select an option </option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                  <option value="Pref">Prefer not to say</option>
+              </select>
             </div>
             <div className="form-group">
               <label htmlFor="q3">What is your year of study?</label>
-              <input type="text" id="q3" autoComplete="off" className="form-control" onChange={e => setYearOfStudy(e.target.value)} />
+              <select className="form-control" id="q3" onChange={e => setYearOfStudy(e.target.value)}> 
+                  <option disabled selected value > select an option </option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="5+">5+</option>
+              </select>
             </div>
             <button className="btn btn-primary" type="submit">
               Submit

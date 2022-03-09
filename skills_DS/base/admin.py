@@ -28,6 +28,5 @@ custom_admin.register(JobPosting, CustomUserAdmin)
 custom_admin.register(Location, CustomUserAdmin)
 custom_admin.register(JobTitle, CustomUserAdmin)
 custom_admin.register(Skill, CustomUserAdmin)
-
-admin.site.register(Profile)
+custom_admin.register(Profile, CustomUserAdmin)
 
