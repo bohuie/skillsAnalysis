@@ -4,10 +4,17 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import FileUploadParser, MultiPartParser
+from django.http import HttpResponse
 from django.core.files.storage import FileSystemStorage
 from datetime import datetime
 import hashlib
+from resume_parser import resumeparse
+import logging
+import json
+import threading
+import contextlib
+import os
 from rest_framework.permissions import IsAdminUser
 from .job_scraping import get_jobs
 from .skills_extraction import extract_skills
@@ -40,7 +47,6 @@ class GetJobsView(APIView):
 		get_jobs(position, location, num, country, remote, radius)
 		return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 
-
 class GetSkillsView(APIView):
 	permission_classes = [IsAdminUser]
 
@@ -55,6 +61,30 @@ class GetSkillsView(APIView):
 			print(ex)
 			return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
+class GetUserProfileView(APIView):
+	def get(self, request, format=None):
+		if request.user.is_authenticated:
+			if Profile.objects.filter(user = request.user).exists():
+				profile = Profile.objects.filter(user = request.user).values()[0]
+				profile["full_name"] = request.user.get_full_name()
+				profile["email"] = request.user.email
+				return Response({'success': profile}, status=status.HTTP_200_OK)
+			else:
+				return Response({'error': 'User does not have a profile.'}, status=status.HTTP_400_BAD_REQUEST)
+		else:
+			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class UpdateUserSkillsView(APIView):
+	def post(self, request):
+		if request.user.is_authenticated:
+			skills = request.data
+			skills_array = [] 
+			for skill in skills:
+				skills_array.append(skill['value'])
+			Profile.objects.filter(user = request.user).update(skills = json.dumps(skills_array))
+			return Response({"success": "successfully updated skills"}, status=status.HTTP_200_OK)
+		else:
+			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED) 
 
 class ListSkillsView(ListAPIView):
 	permission_classes = [IsAdminUser]
@@ -62,7 +92,6 @@ class ListSkillsView(ListAPIView):
 
 	def get_queryset(self):
 		return Skill.objects.filter(verified=False)[:20]
-
 
 class UpdateSkillsView(APIView):
 	permission_classes = [IsAdminUser]
@@ -104,11 +133,39 @@ class FileUploadView(APIView):
 			try:
 				current_user = request.user
 				fs = FileSystemStorage()
-				fs.save(hashlib.sha256(current_user.email.encode()).hexdigest() + "_" + datetime.now().strftime('%m-%d-%Y_%H-%M-%S') + ".pdf", file_obj)
-			except:
-				return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+				fname = hashlib.sha256(current_user.email.encode()).hexdigest() + "_" + datetime.now().strftime('%m-%d-%Y_%H-%M-%S') + ".pdf"
+				fs.save(fname, file_obj)
+				fpath = fs.path(fname)
+				logging.debug("Recieved file: " + fpath)
+				if Profile.objects.filter(user = request.user).exists():
+					t = threading.Thread(target=self.parse_resume_async,args=[fpath,request])
+					t.start()
+				else:
+					logging.debug("User does not have a profile")
+
+			except Exception as e:
+				print ('%s (%s)' % (e.message, type(e)))
+				return HttpResponse({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+			return HttpResponse({'hey': 'it worked'}, status=status.HTTP_200_OK)
+		else:
+			return HttpResponse({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+
+	def parse_resume_async(v, path, request):
+		Profile.objects.filter(user = request.user).update(resume_processing = True)
+		
+		logging.debug("Parsing...")
+		with open(os.devnull, "w") as f, contextlib.redirect_stdout(f):
+			data = resumeparse.read_file(path)
+		logging.debug("Full parsed data: " + str(data))
+		skills = []
+		for skill in data['skills']:
+			skills.append(skill.strip())
+		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
+		Profile.objects.filter(user = request.user).update(resume_processing = False)
+		
+class CheckUserView(APIView):
+	def get(self, request, format=None):
+		if request.user.is_authenticated:
 			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 		else:
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
-
-
