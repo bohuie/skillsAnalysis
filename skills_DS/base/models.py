@@ -55,7 +55,7 @@ class Profile(models.Model):
     age = models.IntegerField(null=True)
     gender = models.CharField(max_length=20)
     yearOfStudy = models.IntegerField(null=True)
-    skills = models.TextField()
+    skills = models.TextField(default="[]")
     resume_processing = models.BooleanField(default=False)
    
     def __str__(self):
