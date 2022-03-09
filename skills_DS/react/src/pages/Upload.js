@@ -2,6 +2,7 @@ import { useState } from "react"
 import axios from "axios"
 import Cookies from "js-cookie"
 import { Worker, Viewer } from "@react-pdf-viewer/core"
+import Alert from "../components/Alert";
 
 const Upload = () => {
   const [selectedFile, setSelectedFile] = useState()
@@ -20,9 +21,13 @@ const Upload = () => {
     }
   }
 
+  const dismissAlert = () => {
+    setButtonClicked(true);
+  }
+
   const checkResumeProcessing = () => {
     try {
-      axios.get("/api/get-profile", {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}}).then((response) => {
+      axios.get("/api/get-profile", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } }).then((response) => {
         if (!response.data.success.resume_processing) {
           window.location.href = "profile/";
         } else {
@@ -90,30 +95,12 @@ const Upload = () => {
         <div>Choose a file to upload</div>
       )}
       {buttonClicked ? (
-        <div
-          className="wrapper"
-          style={{
-            position: "fixed",
-            top: "0",
-            left: "0",
-            width: "100%",
-            zIndex: "99"
-          }}
-        >
-          <div className="alert alert-success alert-dismissible" style={{ textAlign: "center" }}>
-            <button
-              type="button"
-              className="close"
-              onClick={() => {
-                setButtonClicked(false)
-              }}
-            >
-              &times;
-            </button>
-            <strong>Success!</strong> Your file has been uploaded. Please wait while your resume is being processed... &nbsp;&nbsp;
-            <span class="spinner-border spinner-border-sm text-success" role="status"></span>
-          </div>
-        </div>
+        <Alert
+          type="success"
+          message={<span><strong>Success!</strong> Your file has been uploaded. Please wait while your resume is being processed...</span>}
+          spinner={true}
+          handleDismiss={dismissAlert}
+        />
       ) : (
         <div></div>
       )}
