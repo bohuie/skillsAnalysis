@@ -149,25 +149,35 @@ class ResumeUploadView(APIView):
 				if Profile.objects.filter(user = request.user).exists():
 					t = threading.Thread(target=self.parse_resume_async,args=[fpath,request])
 					t.start()
+					return Response({
+						"message": "File uploaded, processing"
+					}, status=status.HTTP_200_OK)
 				else:
-					logging.debug("User does not have a profile")
+					return Response({
+						"message": "User does not have a profile"
+					}, status=status.HTTP_400_BAD_REQUEST)
 
 			except Exception as e:
 				print ('%s (%s)' % (e.message, type(e)))
-				return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
-			return Response({'success': 'it worked'}, status=status.HTTP_200_OK)
+				return Response({
+					"message": "Something went wrong"
+				}, status=status.HTTP_400_BAD_REQUEST)
 		else:
-			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+			return Response({
+				"message": "Empty request"
+			}, status=status.HTTP_400_BAD_REQUEST)
 
 	def parse_resume_async(v, path, request):
 		Profile.objects.filter(user = request.user).update(resume_processing = True)
 		
-		logging.debug("Parsing...")
+		#logging.debug("Parsing...")
 		with open(os.devnull, "w") as f, contextlib.redirect_stdout(f):
 			data = resumeparse.read_file(path)
-		logging.debug("Full parsed data: " + str(data))
+		#logging.debug("Full parsed data: " + str(data))
+		
 		skills = []
 		for skill in data['skills']:
 			skills.append(skill.strip())
+
 		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
 		Profile.objects.filter(user = request.user).update(resume_processing = False)
