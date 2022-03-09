@@ -7,7 +7,6 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', custom_admin.urls),
     path('register/', views.register, name="register"),
-    path('profile/', views.user_profile, name="user_profile"),
     path('login/', views._login, name="login"),
     path('login-redirect/', views.login_redirect, name="login_redirect"),
     path('logout/', auth_views.LogoutView.as_view(template_name="base/logout.html"), name="logout"),

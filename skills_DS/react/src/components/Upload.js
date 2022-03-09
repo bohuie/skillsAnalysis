@@ -1,7 +1,7 @@
-import {useState} from "react"
+import { useState } from "react"
 import axios from "axios"
 import Cookies from "js-cookie"
-import {Worker, Viewer} from "@react-pdf-viewer/core"
+import { Worker, Viewer } from "@react-pdf-viewer/core"
 
 const Upload = () => {
   const [selectedFile, setSelectedFile] = useState()
@@ -20,16 +20,36 @@ const Upload = () => {
     }
   }
 
+  const checkResumeProcessing = () => {
+    try {
+      axios.get("/api/get-profile", {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}}).then((response) => {
+        if (!response.data.success.resume_processing) {
+          window.location.href = "profile/";
+        } else {
+          setTimeout(checkResumeProcessing, 2000);
+        }
+      });
+    } catch (err) { }
+  }
+
   const handleSubmission = () => {
     try {
-      const form_data = new FormData()
+      const form_data = new FormData();
 
-      form_data.append("file", selectedFile)
+      form_data.append("file", selectedFile);
 
-      axios.post("/api/fileupload", form_data, {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken"), "Content-Disposition": `attachment; filename=${selectedFile.name}`, "Content-Type": "multipart/form-data"}}).catch()
+      axios.post("/api/fileupload", form_data, {
+        headers: {
+          "X-CSRFTOKEN": Cookies.get("csrftoken"),
+          "Content-Disposition": `attachment; filename=${selectedFile.name}`,
+          "Content-Type": "multipart/form-data"
+        }
+      }).then((response) => {
+        setButtonClicked(true);
+        checkResumeProcessing();
+      }).catch(err => console.error(err));
 
-      setButtonClicked(true)
-    } catch (err) {}
+    } catch (err) { }
   }
 
   return (
@@ -39,7 +59,7 @@ const Upload = () => {
       <div className="input-group">
         <label className="input-group-btn">
           <span className="btn btn-primary">
-            Browse File <input type="file" name="file" onChange={changeHandler} accept="application/pdf" style={{display: "none"}} multiple />
+            Browse File <input type="file" name="file" onChange={changeHandler} accept="application/pdf" style={{ display: "none" }} multiple />
           </span>
           {selectedFile && <div>{selectedFileName}</div>}
         </label>
@@ -80,7 +100,7 @@ const Upload = () => {
             zIndex: "99"
           }}
         >
-          <div className="alert alert-success alert-dismissible" style={{textAlign: "center"}}>
+          <div className="alert alert-success alert-dismissible" style={{ textAlign: "center" }}>
             <button
               type="button"
               className="close"
@@ -90,7 +110,8 @@ const Upload = () => {
             >
               &times;
             </button>
-            <strong>Success!</strong> Your file has been uploaded.
+            <strong>Success!</strong> Your file has been uploaded. Please wait while your resume is being processed... &nbsp;&nbsp;
+            <span class="spinner-border spinner-border-sm text-success" role="status"></span>
           </div>
         </div>
       ) : (
