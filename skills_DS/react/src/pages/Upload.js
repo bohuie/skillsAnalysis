@@ -8,8 +8,12 @@ const Upload = () => {
   const [selectedFile, setSelectedFile] = useState()
   const [selectedFileName, setSelectedFileName] = useState("")
   const [PDFFile, setPDFFile] = useState(null)
-  const [buttonClicked, setButtonClicked] = useState(false)
-
+  const [alert, setAlert] = useState({
+    visible: false,
+    type: "",
+    message: ""
+  });
+  
   const changeHandler = event => {
     setSelectedFile(event.target.files[0])
     setSelectedFileName(event.target.files[0].name)
@@ -22,7 +26,7 @@ const Upload = () => {
   }
 
   const dismissAlert = () => {
-    setButtonClicked(true);
+    setAlert({ visible: false })
   }
 
   const checkResumeProcessing = () => {
@@ -50,7 +54,11 @@ const Upload = () => {
           "Content-Type": "multipart/form-data"
         }
       }).then((response) => {
-        setButtonClicked(true);
+        setAlert({
+          visible: true,
+          type: "success",
+          message: <span><strong>Success!</strong> Your file has been uploaded. Please wait while your resume is being processed...&nbsp;&nbsp;<span class="spinner-border spinner-border-sm text-success" role="status"></span></span>
+        });
         checkResumeProcessing();
       }).catch(err => console.error(err));
 
@@ -94,16 +102,12 @@ const Upload = () => {
       ) : (
         <div>Choose a file to upload</div>
       )}
-      {buttonClicked ? (
-        <Alert
-          type="success"
-          message={<span><strong>Success!</strong> Your file has been uploaded. Please wait while your resume is being processed...</span>}
-          spinner={true}
-          handleDismiss={dismissAlert}
-        />
-      ) : (
-        <div></div>
-      )}
+      <Alert
+        visible={alert.visible}
+        type={alert.type}
+        message={alert.message}
+        handleDismiss={dismissAlert}
+      />
     </div>
   )
 }

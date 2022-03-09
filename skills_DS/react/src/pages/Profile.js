@@ -1,9 +1,14 @@
 import axios from "axios"
 import Cookies from "js-cookie"
 import { useState, Fragment, useEffect } from "react"
+import Alert from "../components/Alert";
 
 const Profile = props => {
-    const [submitted, setSubmitted] = useState(false);
+    const [alert, setAlert] = useState({
+        visible: false,
+        type: "",
+        message: ""
+    });
     const [error, setError] = useState(null);
     const [skills, setSkills] = useState([]);
     const [profile, setProfile] = useState({
@@ -13,6 +18,10 @@ const Profile = props => {
         age: '',
         year_of_study: ''
     });
+
+    const dismissAlert = () => {
+        setAlert({ visible: false })
+    }
 
     const handleEdit = (event, id) => {
         const newSkills = [...skills];
@@ -36,7 +45,13 @@ const Profile = props => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post("/api/update-user-skills", skills, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } }).then(setSubmitted(true));
+        axios.post("/api/update-user-skills", skills, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } }).then(() => {
+            setAlert({
+                visible: true,
+                type: "success",
+                message: <span><strong>Success!</strong> Your skills has been updated.</span>
+            });
+        });
     }
 
     useEffect(() => {
@@ -144,33 +159,12 @@ const Profile = props => {
                 </div>
             )
             }
-            {submitted ? (
-                <div
-                    className="wrapper"
-                    style={{
-                        position: "fixed",
-                        top: "0",
-                        left: "0",
-                        width: "100%",
-                        zIndex: "99"
-                    }}
-                >
-                    <div className="alert alert-success alert-dismissible" style={{ textAlign: "center" }}>
-                        <button
-                            type="button"
-                            className="close"
-                            onClick={() => {
-                                setSubmitted(false)
-                            }}
-                        >
-                            &times;
-                        </button>
-                        <strong>Success!</strong> Your skills has been updated.
-                    </div>
-                </div>
-            ) : (
-                <div></div>
-            )}
+            <Alert
+                visible={alert.visible}
+                type={alert.type}
+                message={alert.message}
+                handleDismiss={dismissAlert}
+            />
         </Fragment >
     )
 }
