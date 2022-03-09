@@ -2,13 +2,6 @@ from .models import Location, JobPosting, JobTitle, Skill
 import re
 import math
 import nltk
-
-nltk.download('stopwords')
-nltk.download('punkt')
-nltk.download('averaged_perceptron_tagger')
-nltk.download('wordnet')
-nltk.download('words')
-
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.stem import WordNetLemmatizer

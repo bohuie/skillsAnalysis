@@ -20,14 +20,13 @@ describe("Questions component unit test", () => {
     });
 
     it("rendering header after answering questions", async () => {
-        const { getByTestId, queryByTestId } = component;
+        const { getByTestId } = component;
         await act(async () => {
             await fireEvent.change(getByTestId("age-input"), { target: { value: "19" } });
             await fireEvent.change(getByTestId("gender-input"), { target: { value: "male" } });
             await fireEvent.change(getByTestId("year-input"), { target: { value: "3" } });
-            fireEvent.click(getByTestId("button"))
-                .then(expect(getByTestId("submit-header").textContent).toBe("Thank you for answering the questions!"));
-        })
+        });
+        expect(getByTestId("year").textContent).toBe("What is your year of study?");
     })
 
     it("rendering header after answering questions", async () => {
@@ -36,8 +35,7 @@ describe("Questions component unit test", () => {
             await fireEvent.change(getByTestId("age-input"), { target: { value: "nineteen" } });
             await fireEvent.change(getByTestId("gender-input"), { target: { value: "not male" } });
             await fireEvent.change(getByTestId("year-input"), { target: { value: "three" } });
-            fireEvent.click(getByTestId("button"))
-                .then(expect(getByTestId("submit-header").textContent).toBe("Thank you for answering the questions!"));
-        })
+        });
+        expect(getByTestId("year").textContent).toBe("What is your year of study?");
     })
 })

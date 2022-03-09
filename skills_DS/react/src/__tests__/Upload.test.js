@@ -1,5 +1,4 @@
 import { render, act, fireEvent, cleanup } from '@testing-library/react';
-import { Simulate } from 'react-dom/test-utils';
 import Upload from '../components/Upload.js';
 
 describe("Upload component unit test", () => {
@@ -30,7 +29,7 @@ describe("Upload component unit test", () => {
         expect(getByTestId("file-name").textContent).toBe("2022_Quan_Resume.pdf");
     })
 
-    it("input pdf file", async () => {
+    it("input txt file", async () => {
         const { getByTestId } = component;
         await act(async () => {
             const file = new File(['blob'], '2022_Quan_Resume.txt', { type: 'application/txt' });
@@ -38,6 +37,6 @@ describe("Upload component unit test", () => {
                 target: { files: [file] },
             });
         })
-        expect(getByTestId("file-name").textContent).toBe("2022_Quan_Resume.txt");
+        expect(getByTestId("file-name").textContent).toBe("2022_Quan_Resume.txt");  // should still be usable as we are limiting when choosing file
     })
 })
