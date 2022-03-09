@@ -66,12 +66,19 @@ class GetUserProfileView(APIView):
 				profile = Profile.objects.filter(user = request.user).values()[0]
 				profile["full_name"] = request.user.get_full_name()
 				profile["email"] = request.user.email
-				return Response({'success': profile}, status=status.HTTP_200_OK)
+				return Response({
+					"message" : "Retrived user profile",
+					"profile": profile	
+				}, status=status.HTTP_200_OK)
 			else:
-				return Response({'error': 'User does not have a profile.'}, status=status.HTTP_400_BAD_REQUEST)
+				return Response({
+					"message": "User does not have a profile"
+				}, status=status.HTTP_400_BAD_REQUEST)
 		else:
-			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
-
+			return Response({
+					"message": "User not logged in."
+				}, status=status.HTTP_401_UNAUTHORIZED)
+	
 class UpdateUserSkillsView(APIView):
 	def post(self, request):
 		if request.user.is_authenticated:
@@ -80,9 +87,13 @@ class UpdateUserSkillsView(APIView):
 			for skill in skills:
 				skills_array.append(skill['value'])
 			Profile.objects.filter(user = request.user).update(skills = json.dumps(skills_array))
-			return Response({"success": "Successfully updated skills."}, status=status.HTTP_200_OK)
+			return Response({
+					"message" : "Successfully updated skills.",
+				}, status=status.HTTP_200_OK)
 		else:
-			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED) 
+			return Response({
+					"message": "User not logged in."
+				}, status=status.HTTP_401_UNAUTHORIZED)
 
 class ListSkillsView(ListAPIView):
 	permission_classes = [IsAdminUser]
