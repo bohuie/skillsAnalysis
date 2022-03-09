@@ -113,7 +113,7 @@ const Upload = () => {
             </button>
           </div>
           <hr className="m-4" />
-          <Document file={pdfFile} className="d-flex justify-content-center"><Page pageNumber={1} /></Document>
+          <Document file={pdfFile} className="d-flex justify-content-center"><Page pageNumber={1} scale={1.5}/></Document>
         </div>
       )}
     </Fragment>
