@@ -34,14 +34,14 @@ const Upload = () => {
 
   return (
     <div>
-      <h2>Upload resume in pdf format</h2>
+      <h2 data-testid="upload-header">Upload resume in pdf format</h2>
 
-      <div className="input-group">
+      <div data-testid="upload-button" className="input-group">
         <label className="input-group-btn">
-          <span className="btn btn-primary">
-            Browse File <input type="file" name="file" onChange={changeHandler} accept="application/pdf" style={{display: "none"}} multiple />
+          <span data-testid="browse-header" className="btn btn-primary">
+            Browse File<input data-testid="file-input" type="file" name="file" onChange={changeHandler} accept="application/pdf" style={{display: "none"}} multiple />
           </span>
-          {selectedFile && <div>{selectedFileName}</div>}
+          {selectedFile && <div data-testid="file-name">{selectedFileName}</div>}
         </label>
       </div>
 
@@ -61,7 +61,7 @@ const Upload = () => {
               marginTop: "10px"
             }}
           >
-            <button className="btn btn-primary" onClick={handleSubmission}>
+            <button data-testid="submit-button" className="btn btn-primary" onClick={handleSubmission}>
               Submit
             </button>
           </div>
@@ -90,7 +90,7 @@ const Upload = () => {
             >
               &times;
             </button>
-            <strong>Success!</strong> Your file has been uploaded.
+            <strong data-testid="success-message">Success!</strong> Your file has been uploaded.
           </div>
         </div>
       ) : (

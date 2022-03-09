@@ -27,26 +27,26 @@ const Questions = props => {
   return (
     <Fragment>
       {error ? (
-        <h1>{error}</h1>
+        <h1 data-testid="error">{error}</h1>
       ) : received ? (
-        <h1>Thank you for answering the questions!</h1>
+        <h1 data-testid="submit-header">Thank you for answering the questions!</h1>
       ) : (
         <Fragment>
-          <h1>Welcome, please answer some questions.</h1>
+          <h1 data-testid="welcome-header">Welcome, please answer some questions.</h1>
           <form onSubmit={submit} style={{width: 400}}>
             <div className="form-group">
-              <label htmlFor="q1">What is your age?</label>
-              <input type="text" id="q1" autoComplete="off" className="form-control" onChange={e => setAge(e.target.value)} />
+              <label data-testid="age" htmlFor="q1">What is your age?</label>
+              <input data-testid="age-input" type="text" id="q1" autoComplete="off" className="form-control" onChange={e => setAge(e.target.value)} />
             </div>
             <div className="form-group">
-              <label htmlFor="q2">What is your gender?</label>
-              <input type="text" id="q2" autoComplete="off" className="form-control" onChange={e => setGender(e.target.value)} />
+              <label data-testid="gender" htmlFor="q2">What is your gender?</label>
+              <input data-testid="gender-input" type="text" id="q2" autoComplete="off" className="form-control" onChange={e => setGender(e.target.value)} />
             </div>
             <div className="form-group">
-              <label htmlFor="q3">What is your year of study?</label>
-              <input type="text" id="q3" autoComplete="off" className="form-control" onChange={e => setYearOfStudy(e.target.value)} />
+              <label data-testid="year" htmlFor="q3">What is your year of study?</label>
+              <input data-testid="year-input" type="text" id="q3" autoComplete="off" className="form-control" onChange={e => setYearOfStudy(e.target.value)} />
             </div>
-            <button className="btn btn-primary" type="submit">
+            <button data-testid="button" className="btn btn-primary" type="submit">
               Submit
             </button>
           </form>
