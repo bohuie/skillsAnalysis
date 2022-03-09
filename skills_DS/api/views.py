@@ -27,10 +27,14 @@ class AnswersView(APIView):
 				Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
 			else:
 				Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
-			return Response({'success': 'Successfully updated user profile.'}, status=status.HTTP_200_OK)
+			return Response({
+					"message" : "Successfully updated user profile"
+				}, status=status.HTTP_200_OK)
 		else:
 			logging.debug(request.data)
-			return Response({'error': 'Bad Request.'}, status=status.HTTP_400_BAD_REQUEST)
+			return Response({
+					"message" : "Empty Request"
+				}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetJobsView(APIView):
 	permission_classes = [IsAdminUser]
