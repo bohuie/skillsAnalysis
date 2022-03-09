@@ -97,6 +97,13 @@ const Profile = props => {
 
     return (
         <Fragment>
+            <Alert
+                visible={alert.visible}
+                type={alert.type}
+                message={alert.message}
+                handleDismiss={dismissAlert}
+            />
+            
             <div className="shadow p-3 mt-5 mb-5 bg-white rounded">
                 <table className="table">
                     <tbody>
@@ -164,13 +171,6 @@ const Profile = props => {
                     </table>
                 </form>
             </div>
-
-            <Alert
-                visible={alert.visible}
-                type={alert.type}
-                message={alert.message}
-                handleDismiss={dismissAlert}
-            />
         </Fragment >
     )
 }

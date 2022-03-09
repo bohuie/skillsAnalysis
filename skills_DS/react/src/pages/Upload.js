@@ -1,18 +1,23 @@
 import { useState, Fragment } from "react"
 import axios from "axios"
 import Cookies from "js-cookie"
-import { Worker, Viewer } from "@react-pdf-viewer/core"
+import { Document, Page, pdfjs } from 'react-pdf'
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.js`;
 import Alert from "../components/Alert";
 
 const Upload = () => {
   const [selectedFile, setSelectedFile] = useState()
   const [selectedFileName, setSelectedFileName] = useState("")
-  const [PDFFile, setPDFFile] = useState(null)
+  const [pdfFile, setPdfFile] = useState(null)
   const [alert, setAlert] = useState({
     visible: false,
     type: "",
     message: ""
   });
+
+  const dismissAlert = () => {
+    setAlert({ visible: false })
+  }
 
   const changeHandler = event => {
     setSelectedFile(event.target.files[0])
@@ -21,50 +26,54 @@ const Upload = () => {
     reader.readAsDataURL(event.target.files[0])
     reader.onloadend = e => {
       const data = e.target.result
-      setPDFFile(data)
+      setPdfFile(data)
     }
   }
 
-  const dismissAlert = () => {
-    setAlert({ visible: false })
-  }
-
   const checkResumeProcessing = () => {
-    try {
-      axios.get("/api/get-profile", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } }).then((response) => {
+    axios.get("/api/get-profile", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
+      .then((response) => {
         if (!response.data.profile.resume_processing) {
           window.location.href = "profile/";
         } else {
           setTimeout(checkResumeProcessing, 2000);
         }
+      }).catch((error) => {
+        console.log(error);
+        window.location.href = "profile/";
       });
-    } catch (err) { }
   }
 
   const handleSubmission = () => {
-    try {
-      const form_data = new FormData();
+    const form_data = new FormData();
 
-      form_data.append("file", selectedFile);
+    form_data.append("file", selectedFile);
 
-      axios.post("/api/resume-upload", form_data, {
-        headers: {
-          "X-CSRFTOKEN": Cookies.get("csrftoken"),
-          "Content-Disposition": `attachment; filename=${selectedFile.name}`,
-          "Content-Type": "multipart/form-data"
-        }
-      }).then((response) => {
-        setAlert({
-          visible: true,
-          type: "success",
-          message: <span><strong>Success!</strong> Your file has been uploaded. Please wait while your resume is being processed...&nbsp;&nbsp;<span class="spinner-border spinner-border-sm text-success" role="status"></span></span>
-        });
-        checkResumeProcessing();
-      }).catch(err => console.error(err));
-
-    } catch (err) { }
+    axios.post("/api/resume-upload", form_data, {
+      headers: {
+        "X-CSRFTOKEN": Cookies.get("csrftoken"),
+        "Content-Disposition": `attachment; filename=${selectedFile.name}`,
+        "Content-Type": "multipart/form-data"
+      }
+    }).then((response) => {
+      console.log(response);
+      setAlert({
+        visible: true,
+        type: "success",
+        message: <span><strong>Success!</strong> Your file has been uploaded. Please wait while your resume is being processed...&nbsp;&nbsp;<span class="spinner-border spinner-border-sm text-success" role="status"></span></span>
+      });
+      checkResumeProcessing();
+    }).catch((error) => {
+      console.error(error);
+      setAlert({
+        visible: true,
+        type: "danger",
+        message: <span><strong>Error!</strong> {
+          error.response ? (error.response.data.message) : (error.message)
+        }</span>
+      });
+    });
   }
-
   return (
     <Fragment>
       <Alert
@@ -96,17 +105,15 @@ const Upload = () => {
         </table>
       </div>
 
-      {PDFFile && (
+      {pdfFile && (
         <div className="shadow p-3 mb-5 bg-white rounded">
           <div>
             <button className="btn btn-success w-100" onClick={handleSubmission}>
               Submit
             </button>
           </div>
-          <hr class="m-4" />
-          <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.12.313/build/pdf.worker.min.js">
-            <Viewer fileUrl={PDFFile} />
-          </Worker>
+          <hr className="m-4" />
+          <Document file={pdfFile} className="d-flex justify-content-center"><Page pageNumber={1} /></Document>
         </div>
       )}
     </Fragment>
