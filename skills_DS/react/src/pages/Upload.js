@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, Fragment } from "react"
 import axios from "axios"
 import Cookies from "js-cookie"
 import { Worker, Viewer } from "@react-pdf-viewer/core"
@@ -13,7 +13,7 @@ const Upload = () => {
     type: "",
     message: ""
   });
-  
+
   const changeHandler = event => {
     setSelectedFile(event.target.files[0])
     setSelectedFileName(event.target.files[0].name)
@@ -32,7 +32,7 @@ const Upload = () => {
   const checkResumeProcessing = () => {
     try {
       axios.get("/api/get-profile", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } }).then((response) => {
-        if (!response.data.success.resume_processing) {
+        if (!response.data.profile.resume_processing) {
           window.location.href = "profile/";
         } else {
           setTimeout(checkResumeProcessing, 2000);
@@ -66,49 +66,50 @@ const Upload = () => {
   }
 
   return (
-    <div>
-      <h2>Upload resume in pdf format</h2>
-
-      <div className="input-group">
-        <label className="input-group-btn">
-          <span className="btn btn-primary">
-            Browse File <input type="file" name="file" onChange={changeHandler} accept="application/pdf" style={{ display: "none" }} multiple />
-          </span>
-          {selectedFile && <div>{selectedFileName}</div>}
-        </label>
-      </div>
-
-      {PDFFile ? (
-        <div>
-          <div
-            style={{
-              border: "1px solid rgba(0, 0, 0, 0.3)"
-            }}
-          >
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.12.313/build/pdf.worker.min.js">
-              <Viewer fileUrl={PDFFile} />
-            </Worker>
-          </div>
-          <div
-            style={{
-              marginTop: "10px"
-            }}
-          >
-            <button className="btn btn-primary" onClick={handleSubmission}>
-              Submit
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div>Choose a file to upload</div>
-      )}
+    <Fragment>
       <Alert
         visible={alert.visible}
         type={alert.type}
         message={alert.message}
         handleDismiss={dismissAlert}
       />
-    </div>
+
+      <div className="shadow p-3 mt-5 mb-3 bg-white rounded">
+        <table className="table m-0">
+          <tbody>
+            <tr className="table-borderless">
+              <td colSpan={2}><h3>Upload your resume in pdf format</h3></td>
+            </tr>
+            <tr>
+              <td>
+                <div className="input-group">
+                  <label className="input-group-btn w-100">
+                    <span className="btn btn-primary w-100">
+                      Browse File <input type="file" name="file" onChange={changeHandler} accept="application/pdf" style={{ display: "none" }} multiple />
+                    </span>
+                  </label>
+                </div>
+              </td>
+              {selectedFile && <td><b>{selectedFileName}</b></td>}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {PDFFile && (
+        <div className="shadow p-3 mb-5 bg-white rounded">
+          <div>
+            <button className="btn btn-success w-100" onClick={handleSubmission}>
+              Submit
+            </button>
+          </div>
+          <hr class="m-4" />
+          <Worker workerUrl="https://unpkg.com/pdfjs-dist@2.12.313/build/pdf.worker.min.js">
+            <Viewer fileUrl={PDFFile} />
+          </Worker>
+        </div>
+      )}
+    </Fragment>
   )
 }
 

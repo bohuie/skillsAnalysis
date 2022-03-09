@@ -97,8 +97,7 @@ const Profile = props => {
 
     return (
         <Fragment>
-            <br />
-            <div className="shadow p-3 mb-5 bg-white rounded">
+            <div className="shadow p-3 mt-5 mb-5 bg-white rounded">
                 <table className="table">
                     <tbody>
                         <tr className="table-borderless">
