@@ -19,56 +19,7 @@ import threading
 import contextlib
 import os
 
-# Create your views here.
-class AnswersView(APIView):
-	def post(self, request):
-		try:
-			if request.data and 'age' in request.data and 'gender' in request.data and 'yearOfStudy' in request.data:		
-				if Profile.objects.filter(user = request.user).exists():
-					Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
-				else:
-					Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy =  request.data['yearOfStudy'])
-				return Response({
-						"message" : "Successfully updated user profile"
-					}, status=status.HTTP_200_OK)
-			else:
-				logging.debug(request.data)
-				return Response({
-						"message" : "Bad Request"
-					}, status=status.HTTP_400_BAD_REQUEST)
-		except Exception as e:
-			logging.debug(str(e))
-			return Response({
-						"message" : "Internal Server Error"
-					}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-class GetJobsView(APIView):
-	permission_classes = [IsAdminUser]
-
-	def post(self, request):
-		position = request.data['position']
-		location = request.data['location']
-		country = request.data['country']
-		remote = request.data['remote']
-		num = int(request.data['number'])
-		radius = int(request.data['radius'])
-		get_jobs(position, location, num, country, remote, radius)
-		return Response({'Success': 'Retrieved jobs.'}, status=status.HTTP_200_OK)
-
-class GetSkillsView(APIView):
-	permission_classes = [IsAdminUser]
-
-	def post(self, request):
-		position = request.data['position']
-		location = request.data['location']
-		distance = int(request.data['distance'])
-		try:
-			extract_skills(position, location, distance)
-			return Response({"success": "Retrieved skills."}, status=status.HTTP_200_OK)
-		except Exception as ex:
-			logging.debug(ex)
-			return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
-
+# User views
 class GetUserProfileView(APIView):
 	def get(self, request, format=None):
 		if request.user.is_authenticated:
@@ -106,50 +57,6 @@ class UpdateUserSkillsView(APIView):
 			return Response({
 					"message": "User not logged in."
 				}, status=status.HTTP_401_UNAUTHORIZED)
-
-class ListSkillsView(ListAPIView):
-	permission_classes = [IsAdminUser]
-	serializer_class = SkillSerializer
-
-	def get_queryset(self):
-		return Skill.objects.filter(verified=False)[:20]
-
-class UpdateSkillsView(APIView):
-	permission_classes = [IsAdminUser]
-	
-	def post(self, request):
-		skills = request.data
-		for skill in skills:
-			job_title = JobTitle.objects.filter(name=skill['job_title'])
-			if len(job_title) == 0:
-				print("could not get job title")
-				continue
-			job_title = job_title[0]
-			query = Skill.objects.filter(name=skill['skill'], job_title=job_title)
-			if len(query) > 0:
-				query = query[0]
-				if skill['value'] == "good":
-					query.verified = True
-					query.save()
-				if skill['value'] == "invalid":
-					InvalidSkill.objects.get_or_create(job_title=job_title, name=skill['skill'], specific=False)
-					query.delete()
-				if skill['value'] == "invalid2":
-					InvalidSkill.objects.get_or_create(job_title=job_title, name=skill['skill'], specific=True)
-					query.delete()
-			else:
-				return Response({
-					"message": "Could not get skills"
-				}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-		new_skills = Skill.objects.filter(verified=False)[:50]
-		new_skill_list = []
-		for skill in new_skills:
-			new_skill_list.append(SkillSerializer(skill).data)
-		return Response({
-				"message": "Successfully updated skills", 
-				"new_skills": new_skill_list
-			}, status=status.HTTP_200_OK)
 
 class ResumeUploadView(APIView):
 	parser_classes = (MultiPartParser,)
@@ -200,3 +107,99 @@ class ResumeUploadView(APIView):
 
 		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
 		Profile.objects.filter(user = request.user).update(resume_processing = False)
+
+class AnswersView(APIView):
+	def post(self, request):
+		try:
+			if request.data and 'age' in request.data and 'gender' in request.data and 'yearOfStudy' in request.data:		
+				if Profile.objects.filter(user = request.user).exists():
+					Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
+				else:
+					Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy =  request.data['yearOfStudy'])
+				return Response({
+						"message" : "Successfully updated user profile"
+					}, status=status.HTTP_200_OK)
+			else:
+				logging.debug(request.data)
+				return Response({
+						"message" : "Bad Request"
+					}, status=status.HTTP_400_BAD_REQUEST)
+		except Exception as e:
+			logging.debug(str(e))
+			return Response({
+						"message" : "Internal Server Error"
+					}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Admin views
+class GetJobsView(APIView):
+	permission_classes = [IsAdminUser]
+
+	def post(self, request):
+		position = request.data['position']
+		location = request.data['location']
+		country = request.data['country']
+		remote = request.data['remote']
+		num = int(request.data['number'])
+		radius = int(request.data['radius'])
+		get_jobs(position, location, num, country, remote, radius)
+		return Response({'Success': 'Retrieved jobs.'}, status=status.HTTP_200_OK)
+
+class GetSkillsView(APIView):
+	permission_classes = [IsAdminUser]
+
+	def post(self, request):
+		position = request.data['position']
+		location = request.data['location']
+		distance = int(request.data['distance'])
+		try:
+			extract_skills(position, location, distance)
+			return Response({"success": "Retrieved skills."}, status=status.HTTP_200_OK)
+		except Exception as ex:
+			logging.debug(ex)
+			return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
+class ListSkillsView(ListAPIView):
+	permission_classes = [IsAdminUser]
+	serializer_class = SkillSerializer
+
+	def get_queryset(self):
+		return Skill.objects.filter(verified=False)[:20]
+
+class UpdateSkillsView(APIView):
+	permission_classes = [IsAdminUser]
+
+	def post(self, request):
+		skills = request.data
+		for skill in skills:
+			job_title = JobTitle.objects.filter(name=skill['job_title'])
+			if len(job_title) == 0:
+				print("could not get job title")
+				continue
+			job_title = job_title[0]
+			query = Skill.objects.filter(name=skill['skill'], job_title=job_title)
+			if len(query) > 0:
+				query = query[0]
+				if skill['value'] == "good":
+					query.verified = True
+					query.save()
+				if skill['value'] == "invalid":
+					InvalidSkill.objects.get_or_create(job_title=job_title, name=skill['skill'], specific=False)
+					query.delete()
+				if skill['value'] == "invalid2":
+					InvalidSkill.objects.get_or_create(job_title=job_title, name=skill['skill'], specific=True)
+					query.delete()
+			else:
+				return Response({
+					"message": "Could not get skills"
+				}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+		new_skills = Skill.objects.filter(verified=False)[:50]
+		new_skill_list = []
+		for skill in new_skills:
+			new_skill_list.append(SkillSerializer(skill).data)
+		return Response({
+				"message": "Successfully updated skills", 
+				"new_skills": new_skill_list
+			}, status=status.HTTP_200_OK)
+
+# Misc. views
