@@ -66,7 +66,7 @@ class GetSkillsView(APIView):
 			extract_skills(position, location, distance)
 			return Response({"success": "Retrieved skills."}, status=status.HTTP_200_OK)
 		except Exception as ex:
-			print(ex)
+			logging.debug(ex)
 			return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
 
 class GetUserProfileView(APIView):
