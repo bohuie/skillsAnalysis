@@ -22,19 +22,25 @@ import os
 # Create your views here.
 class AnswersView(APIView):
 	def post(self, request):
-		if request.data:		
-			if Profile.objects.filter(user = request.user).exists():
-				Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
+		try:
+			if request.data and 'age' in request.data and 'gender' in request.data and 'yearOfStudy' in request.data:		
+				if Profile.objects.filter(user = request.user).exists():
+					Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
+				else:
+					Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy =  request.data['yearOfStudy'])
+				return Response({
+						"message" : "Successfully updated user profile"
+					}, status=status.HTTP_200_OK)
 			else:
-				Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
+				logging.debug(request.data)
+				return Response({
+						"message" : "Bad Request"
+					}, status=status.HTTP_400_BAD_REQUEST)
+		except Exception as e:
+			logging.debug(str(e))
 			return Response({
-					"message" : "Successfully updated user profile"
-				}, status=status.HTTP_200_OK)
-		else:
-			logging.debug(request.data)
-			return Response({
-					"message" : "Empty Request"
-				}, status=status.HTTP_400_BAD_REQUEST)
+						"message" : "Internal Server Error"
+					}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class GetJobsView(APIView):
 	permission_classes = [IsAdminUser]
@@ -68,6 +74,8 @@ class GetUserProfileView(APIView):
 		if request.user.is_authenticated:
 			if Profile.objects.filter(user = request.user).exists():
 				profile = Profile.objects.filter(user = request.user).values()[0]
+				profile["gender"] = Profile.Gender[profile["gender"]].value
+				profile["yearOfStudy"] = Profile.Year[profile["yearOfStudy"]].value
 				profile["full_name"] = request.user.get_full_name()
 				profile["email"] = request.user.email
 				return Response({

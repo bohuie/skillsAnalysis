@@ -17,11 +17,9 @@ const Questions = props => {
     setAlert({ visible: false })
   }
 
-  const [received, setReceived] = useState(false)
-  const [error, setError] = useState(null)
-
   const handleSubmit = (event) => {
     event.preventDefault()
+    console.log({ age, gender, yearOfStudy });
     axios
       .post("/api/answers", { age, gender, yearOfStudy }, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
       .then((response) => {
@@ -66,19 +64,33 @@ const Questions = props => {
               <tr>
                 <td>What is your age?</td>
                 <td>
-                  <input type="text" id="q1" autoComplete="off" className="form-control" onChange={e => setAge(e.target.value)} />
+                  <input required type="number" id="q1" min="1" max="99" autoComplete="off" className="form-control" onChange={e => setAge(e.target.value)} />
                 </td>
               </tr>
               <tr>
                 <td>What is your gender?</td>
                 <td>
-                  <input type="text" id="q2" autoComplete="off" className="form-control" onChange={e => setGender(e.target.value)} />
+                  <select required className="form-control" id="q2" onChange={e => setGender(e.target.value)} defaultValue={''}>
+                    <option disabled hidden value="" > select an option </option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                    <option value="Pref">Prefer not to say</option>
+                  </select>
                 </td>
               </tr>
               <tr>
                 <td>What is your year of study?</td>
                 <td>
-                  <input type="text" id="q3" autoComplete="off" className="form-control" onChange={e => setYearOfStudy(e.target.value)} />
+                  <select required className="form-control" id="q3" onChange={e => setYearOfStudy(e.target.value)} defaultValue={''}>
+                    <option disabled hidden value="" > select an option </option>
+                    <option value="One">1</option>
+                    <option value="Two">2</option>
+                    <option value="Three">3</option>
+                    <option value="Four">4</option>
+                    <option value="Five">5</option>
+                    <option value="Fivep">5+</option>
+                  </select>
                 </td>
               </tr>
               <tr>
