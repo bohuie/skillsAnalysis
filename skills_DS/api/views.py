@@ -116,6 +116,7 @@ class ListSkillsView(ListAPIView):
 
 class UpdateSkillsView(APIView):
 	permission_classes = [IsAdminUser]
+	
 	def post(self, request):
 		skills = request.data
 		for skill in skills:
@@ -137,12 +138,18 @@ class UpdateSkillsView(APIView):
 					InvalidSkill.objects.get_or_create(job_title=job_title, name=skill['skill'], specific=True)
 					query.delete()
 			else:
-				return Response({"error": "Could not get skills"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)	
+				return Response({
+					"message": "Could not get skills"
+				}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 		new_skills = Skill.objects.filter(verified=False)[:50]
 		new_skill_list = []
 		for skill in new_skills:
 			new_skill_list.append(SkillSerializer(skill).data)
-		return Response({"success": "successfully updated skills", "new_skills": new_skill_list}, status=status.HTTP_200_OK)
+		return Response({
+				"message": "Successfully updated skills", 
+				"new_skills": new_skill_list
+			}, status=status.HTTP_200_OK)
 
 class ResumeUploadView(APIView):
 	parser_classes = (MultiPartParser,)
