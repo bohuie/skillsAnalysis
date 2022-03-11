@@ -18,7 +18,7 @@ import json
 import threading
 import contextlib
 import os
-
+ 
 # User views
 class GetUserProfileView(APIView):
 	def get(self, request, format=None):
@@ -107,6 +107,7 @@ class ResumeUploadView(APIView):
 
 		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
 		Profile.objects.filter(user = request.user).update(resume_processing = False)
+		return
 
 class AnswersView(APIView):
 	def post(self, request):
@@ -131,20 +132,7 @@ class AnswersView(APIView):
 					}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Admin views
-class GetJobsView(APIView):
-	permission_classes = [IsAdminUser]
-
-	def post(self, request):
-		position = request.data['position']
-		location = request.data['location']
-		country = request.data['country']
-		remote = request.data['remote']
-		num = int(request.data['number'])
-		radius = int(request.data['radius'])
-		get_jobs(position, location, num, country, remote, radius)
-		return Response({'Success': 'Retrieved jobs.'}, status=status.HTTP_200_OK)
-
-class GetSkillsView(APIView):
+class ExtractSkillsView(APIView):
 	permission_classes = [IsAdminUser]
 
 	def post(self, request):
@@ -153,10 +141,14 @@ class GetSkillsView(APIView):
 		distance = int(request.data['distance'])
 		try:
 			extract_skills(position, location, distance)
-			return Response({"success": "Retrieved skills."}, status=status.HTTP_200_OK)
+			return Response({
+						"message": "Retrieved skills."
+					}, status=status.HTTP_200_OK)
 		except Exception as ex:
 			logging.debug(ex)
-			return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+			return Response({
+						"message": str(ex)
+					}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ListSkillsView(ListAPIView):
 	permission_classes = [IsAdminUser]

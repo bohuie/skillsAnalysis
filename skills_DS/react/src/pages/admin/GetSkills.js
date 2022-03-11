@@ -1,48 +1,111 @@
 import axios from "axios"
 import Cookies from "js-cookie"
-import {useState, Fragment} from "react"
+import { useState, Fragment } from "react"
 import professions from "professions"
-import {googleMapsKey} from "../../secrets.json"
+import { googleMapsKey } from "../../secrets.json"
+import Alert from "../../components/Alert"
 
 const GetSkills = props => {
-  const [scrapeError, setScrapeError] = useState(null)
   const [extractError, setExtractError] = useState(null)
+  const [alert, setAlert] = useState({
+    visible: false,
+    type: "",
+    message: ""
+  });
+
+  const dismissAlert = () => {
+    setAlert({ visible: false })
+  }
 
   const scrapeJobs = event => {
     event.preventDefault()
-    setScrapeError(null)
-    let {position, number, remote, location, radius} = event.target.elements
+    let { position, number, remote, location, radius } = event.target.elements
     axios
       .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${googleMapsKey}`)
-      .then(({data: {results}}) => {
+      .then(({ data: { results } }) => {
         if (results.length === 0) throw "Could not get location"
-        let {address_components} = results[0]
+        let { address_components } = results[0]
         let loc = remote.value === "only" ? "remote" : address_components.find(ac => ac.types.includes("sublocality"))?.long_name || address_components.find(ac => ac.types.includes("locality"))?.long_name + " " + address_components.find(ac => ac.types.includes("administrative_area_level_1")).long_name
         let country = address_components.find(ac => ac.types.includes("country")).short_name
-        return axios.post("/api/get-jobs", {position: position.value, location: {name: loc, ...results[0].geometry.location}, number: number.value, country, remote: remote.value, radius: radius.value || 0}, {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}})
+        axios
+          .post("/api/scrape-jobs", {
+            position: position.value,
+            location: { name: loc, ...results[0].geometry.location },
+            number: number.value,
+            country,
+            remote: remote.value,
+            radius: radius.value || 0
+          }, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
+          .then((response) => {
+            setAlert({
+              visible: true,
+              type: "success",
+              message: <span><strong>Success!</strong> Scraping jobs...&nbsp;&nbsp;<span class="spinner-border spinner-border-sm text-success" role="status"></span></span>
+            });
+            setTimeout(checkScrapeProgress, 2000);
+          })
+          .catch((error) => {
+            setAlert({
+              visible: true,
+              type: "danger",
+              message: <span><strong>Error!</strong> Something went wrong.</span>
+            });
+            console.error(error);
+          })
       })
-      .then(res => {
-        console.log(res.data.hey)
+      .catch((error) => {
+        setAlert({
+          visible: true,
+          type: "danger",
+          message: <span><strong>Error!</strong> {error.toString()}</span>
+        });
+        console.error(error);
       })
-      .catch(err => {
-        console.error(err)
-        setScrapeError(err.toString())
+  }
+
+  const checkScrapeProgress = () => {
+    axios.get("/api/scrape-jobs", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
+      .then((response) => {
+        let progress = response.data.progress
+        console.log(response)
+        if (progress.processing) {
+          setAlert({
+            visible: true,
+            type: "success",
+            message: <span><strong>Scraping...</strong> Scraped {progress.num_scraped} jobs.&nbsp;&nbsp;<span class="spinner-border spinner-border-sm text-success" role="status"></span></span>
+          });
+          setTimeout(checkScrapeProgress, 2000);
+        } else {
+          setAlert({
+            visible: true,
+            type: "success",
+            message: <span><strong>Done!</strong> Scraped {progress.num_scraped} jobs.</span>
+          });
+        }
+      })
+      .catch((error) => {
+        setAlert({
+          visible: true,
+          type: "danger",
+          message: <span><strong>Error!</strong> Something went wrong.</span>
+        });
+        console.error(error);
       })
   }
 
   const extractSkills = event => {
     event.preventDefault()
     setExtractError(null)
-    let {extractPosition, extractLocation, distance} = event.target.elements
+    let { extractPosition, extractLocation, distance } = event.target.elements
     axios
       .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${extractLocation.value}&key=${googleMapsKey}`)
-      .then(({data: {results}}) => {
+      .then(({ data: { results } }) => {
         if (results.length === 0) throw "Could not get location"
-        let {address_components} = results[0]
+        let { address_components } = results[0]
         let loc = address_components.find(ac => ac.types.includes("sublocality"))?.long_name || address_components.find(ac => ac.types.includes("locality"))?.long_name + " " + address_components.find(ac => ac.types.includes("administrative_area_level_1")).long_name
-        return axios.post("/api/get-skills", {position: extractPosition.value, location: {name: loc, ...results[0].geometry.location}, distance: distance.value}, {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}})
+        return axios.post("/api/get-skills", { position: extractPosition.value, location: { name: loc, ...results[0].geometry.location }, distance: distance.value }, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
       })
-      .then(({data}) => {
+      .then(({ data }) => {
         console.log(data)
       })
       .catch(err => {
@@ -53,7 +116,14 @@ const GetSkills = props => {
 
   return (
     <Fragment>
-      <div class="shadow p-3 mb-5 bg-white rounded">
+      <Alert
+        visible={alert.visible}
+        type={alert.type}
+        message={alert.message}
+        handleDismiss={dismissAlert}
+      />
+
+      <div className="shadow p-3 mb-5 bg-white rounded">
         <h1>Scrape Jobs</h1>
         <form onSubmit={scrapeJobs}>
           <div className="form-group">
@@ -90,10 +160,9 @@ const GetSkills = props => {
             Get jobs
           </button>
         </form>
-        {scrapeError && <p className="text-danger">{scrapeError}</p>}
       </div>
-      <br />
-      <div class="shadow p-3 mb-5 bg-white rounded">
+
+      <div className="shadow p-3 mb-5 bg-white rounded">
         <h1>Extract Skills</h1>
         <form onSubmit={extractSkills}>
           <div className="form-group">
