@@ -14,3 +14,4 @@ python3 -m nltk.downloader universal_tagset
 python3 -m nltk.downloader wordnet
 python3 -m nltk.downloader brown
 python3 -m nltk.downloader maxent_ne_chunker
+python3 -m nltk.downloader omw-1.4

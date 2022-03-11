@@ -19,7 +19,7 @@ from rest_framework.permissions import IsAdminUser
 from .job_scraping import get_jobs
 from .skills_extraction import extract_skills
 from .serializers import SkillSerializer
-from .models import JobTitle, Skill, InvalidSkill
+from .models import JobPosting, JobTitle, Skill, InvalidSkill
 
 # Create your views here.
 class AnswersView(APIView):
@@ -169,3 +169,23 @@ class CheckUserView(APIView):
 			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 		else:
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+
+class GetJobTitleView(APIView):
+	def get(self,request,format=None):
+		if request.user.is_authenticated:
+			jobTitle = JobTitle.objects.all().values()
+			return Response({'title': jobTitle}, status=status.HTTP_200_OK)
+		else:
+			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class GetJobSkillView(APIView):
+	def post(self, request):
+		if request.data:		
+			jobTitle = request.data['job']
+			jobSkill = Skill.objects.filter(job_title__name =jobTitle).values('name','count')
+			return Response({'skills': jobSkill},status=status.HTTP_200_OK)	
+		else:
+			print(request.data)
+			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+
+	

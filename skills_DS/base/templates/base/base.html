@@ -34,6 +34,11 @@
             <a class="nav-link" href="/admin/">Admin</a>
           </li>
           {% endif %}
+          {% if user.is_authenticated %}
+          <li class="nav-item active">
+            <a class="nav-link" href="/word-cloud">Word Cloud</a>
+          </li>
+          {% endif %}
         </ul>
 
         {% if user.is_authenticated %}

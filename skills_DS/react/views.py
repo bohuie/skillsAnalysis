@@ -11,3 +11,6 @@ def login_required(request):
 		return render(request, 'react/index.html')
 	else:
 		return redirect("login")
+
+def word_cloud(request):
+	return render(request,'react/index.html')

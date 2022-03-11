@@ -7,6 +7,7 @@ import GetSkills from "./components/admin/GetSkills"
 import BrowseSkills from "./components/admin/BrowseSkills"
 import Upload from "./components/Upload"
 import Profile from "./components/Profile"
+import WordCloud from "./components/WordCloud"
 
 ReactDOM.render(
   <React.StrictMode>
@@ -18,6 +19,7 @@ ReactDOM.render(
         <Route path="/admin/browse-skills" element={<BrowseSkills />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/word-cloud" element={<WordCloud/>} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
