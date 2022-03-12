@@ -9,6 +9,8 @@ const WC = () => {
   const[jobTitles,setjobTitles] = useState([])
   const[job,setJob] = useState(null)
   const [error, setError] = useState(null)
+  const [profession,setProfession] = useState(null)
+  const [button,setButton] = useState(false)
  
 
   const submit = e => {
@@ -38,7 +40,7 @@ const WC = () => {
       })
   }, [])
 
-   useEffect(() => {
+  useEffect(() => {
     axios
       .get("/api/get-profile", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
       .then(({ data }) => {
@@ -57,12 +59,18 @@ const WC = () => {
       })
   }, [])
 
+ const handleChange = (e) => {
+    setProfession(e.target.value)
+    setJob(e.target.value)
+    setButton(true)
+  }
+
   return(
     <Fragment>
       <div className= "dropdown" >
         <form onSubmit={submit} style={{ display:"flex",padding:"2"}}>
           <div className="form">
-            <select className="form-control w-100" onChange={e => setJob(e.target.value) }>
+            <select name="profession" value= {profession} className="form-control w-100" onChange={handleChange}>
               <option disabled selected value> select an option </option>
               {
                 jobTitles.map((title)=>{
@@ -74,7 +82,7 @@ const WC = () => {
             </select>
           </div>
           <div className="button">
-            <button type="submit" className="btn btn-primary">Enter</button>
+            <button type="submit" className="btn btn-primary" disabled = {!profession}>Enter</button>
           </div>
      
         </form>
