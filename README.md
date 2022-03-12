@@ -1,14 +1,11 @@
 ## Table of contents
 
-* [Installation](#installation)
+* [Setup](#setup)
   * [First time setup](#first-time-setup)
   * [Running the tech stack](#running-the-tech-stack)
-* [Usage](#usage)
-  * [Permission Table](#permission-table)
-  * [User](#user)
-  * [Admin](#admin)
+* [Permissions](#permissions)
 
-## Installation
+## Setup
 
 A docker-compose file is provided to run the entire tech stack with Docker. This includes Django, React as well as PostgreSQL.
 
@@ -52,20 +49,18 @@ to start all containers. Then navigate to `localhost:8000` to view the webpage.
 
 **Note: If you at any point added or removed any dependencies from React or Django, you will have to re-build the docker images. Follow the First time setup guide on how to build the images. If Django model is modified, you will have to re-initialize the database as well.**
 
-## Usage
+## Permissions
 
+This is a detailed table showing user & admin permissions on the platform.
 
-
-### Permission Table
-
-| Permissions       | Description                                         |User|Admin|
-| ----------------- | ---------------------------------------------------- |:-:|:-:|
-| Registration      | Registering with email with ability to login/logout  | + | + |
-| Upload resume     | Uploading resume to match jobs with similar skillset | + | + |
-| Skills extraction | Extract skills from uploaded resume                  | + | + |
-| Edit skills       | Edit extracted skills from resume                    | + | + |
-| Edit profile      | Edit user info and account permissions               | - | + |
-
-### User
-
-### Admin
+| Permissions              | Description                                              |User|Admin|
+| ------------------------ | --------------------------------------------------------------- |:-:|:-:|
+| Registration             | Registering on the platform with ability to login/logout        | + | + |
+| Upload resume            | Uploading resume to match jobs with similar skillset            | + | + |
+| Resume skills extraction | Extract skills from uploaded resume                             | + | + |
+| Edit skills              | Edit extracted skills from resume                               | + | + |
+| Get matched jobs         | Get matched jobs depending on matched skills to job description | + | + |
+| Edit profile             | Edit user info and account permissions                          | - | + |
+| View profile             | View user info and account permissions                          | - | + |
+| Job scraping             | Fetch jobs from Indeed                                          | - | + |
+| Job skills extraction    | Extract skills from scraped jobs                                | - | + |
