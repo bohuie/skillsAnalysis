@@ -5,24 +5,24 @@ import axios from "axios"
 import Cookies from "js-cookie"
 import { useState, Fragment, useEffect } from "react"
 
-const WC = props =>{
-  const[enter,setEnter] = useState(false)
+const WC = () => {
   const[jobTitles,setjobTitles] = useState([])
   const[job,setJob] = useState(null)
-  const[skills,setSkills] = useState([])
-  const[error,setError] = useState(null)
-  var data;
+  const [error, setError] = useState(null)
+ 
+
   const submit = e => {
+    var data;
     e.preventDefault();
     axios
       .post("/api/get-job-skills",{job}, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") }})
       .then((s) => {
         data = s.data.skills.map(({name,count}) => ({text: name, value: count}))
-        ReactDOM.render(<div id="root"><WordCloud data={data} /></div>, document.getElementById('render'))
+        ReactDOM.render(<div id="root"><WordCloud data={data} width={200} height={200} rotate={0} padding={0} /></div>, document.getElementById('render'))
       })
       .catch(err => {
-        console.error(err, err?.response, err?.response?.data)
-        setError("bad request")
+        console.error(err)
+        setError("unable to get data")
       })
   };
 
@@ -30,55 +30,58 @@ const WC = props =>{
     axios
         .get("/api/get-job-titles", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
         .then(({ data }) => {
-          //console.log(data)
           setjobTitles(data.title)
-          //console.log(jobTitles)
         })
+        .catch(err => {
+          console.error(err)
+          setError("database is empty")
+      })
   }, [])
 
    useEffect(() => {
     axios
       .get("/api/get-profile", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
       .then(({ data }) => {
-          console.log(data);
-          const y = 100
           var z;
-          if (data.success) {
-              //console.log(data.success.skills)
-              z = JSON.parse(data.success.skills).map((skill, index) => ({ text: skill, value: 100}))
-              //setSkills(JSON.parse(data.success.skills).map(({name,y}) => ({text: name, value: y})));
-              ReactDOM.render(<WordCloud data={z} />, document.getElementById('skill'))
-            }
+          console.log(data.success.skills.length)
+          if (data.success.skills.length > 2) {
+            z = JSON.parse(data.success.skills).map((skill, index) => ({ text: skill, value: 100}))
+            ReactDOM.render(<WordCloud data={z} width={150} height={100} rotate={0} padding={0} />, document.getElementById('skill'))
+          }
           else
-              setError("Unable to get data.")
+              setError("no profile yet")
       })
       .catch(err => {
           console.error(err)
-          setError("Unable to get data.")
+          setError("no profile yet")
       })
   }, [])
 
   return(
     <Fragment>
       <div className= "dropdown" >
-        <form onSubmit={submit} >
-          <select className="form-control w-50" onChange={e => setJob(e.target.value) }>
-            <option disabled selected value> select an option </option>
-            {
-              jobTitles.map((title)=>{
-                return(
-                  <option  value={title.name} key = {title.id}>{title.name}</option>
-                )
-              })
-            }
-          </select>
-          <button type="submit" className="btn btn-primary">Enter</button>
+        <form onSubmit={submit} style={{ display:"flex",padding:"2"}}>
+          <div className="form">
+            <select className="form-control w-100" onChange={e => setJob(e.target.value) }>
+              <option disabled selected value> select an option </option>
+              {
+                jobTitles.map((title)=>{
+                  return(
+                    <option  value={title.name} key = {title.id}>{title.name}</option>
+                  )
+                })
+              }
+            </select>
+          </div>
+          <div className="button">
+            <button type="submit" className="btn btn-primary">Enter</button>
+          </div>
+     
         </form>
       </div>
       <div id="render" ></div>
-      <h1>Your skills</h1>
+      <h1>Your skills: {error}</h1>
       <div id="skill"></div>
-      
     </Fragment>
   )
 
