@@ -3,12 +3,21 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
-from .models import Location, JobPosting, JobTitle
+from rest_framework.generics import ListAPIView
+from .models import Location, JobPosting, JobTitle, Skill, InvalidSkill
 from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
+from .serializers import SkillSerializer
 import logging
 import threading
 import requests
+import re
+import math
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import wordnet
 
 class ScrapeJobsView(APIView):
     permission_classes = [IsAdminUser]
@@ -134,3 +143,171 @@ class ScrapeJobsView(APIView):
         if description == "":
             return None
         return (job_title, company, isRemote, description)
+
+class ExtractSkillsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    progress = {"processing": False, "num_processed": 0}
+    stop_words = set(stopwords.words("english"))
+    lemmatizer = WordNetLemmatizer()
+
+    custom_stopwords = []
+
+    def post(self, request):
+        position = request.data['position']
+        location = request.data['location']
+        distance = int(request.data['distance'])
+        if not ExtractSkillsView.progress["processing"]:
+            try:
+                titles = JobTitle.objects.filter(name=position.lower())
+                if len(titles) == 0:
+                    return Response({
+                            "message": "There are no jobs in the database for the provided position."
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                title = titles[0]
+                (x1, x2, y1, y2) = self.get_coordinates(location, distance)
+                #logging.debug(x1,x2,y1,y2)
+                jobs = JobPosting.objects.filter(location__lat__gte=x1, location__lat__lte=x2, location__lng__gte=y1, location__lng__lte=y2, job_title=title)
+                if len(jobs) == 0:
+                    return Response({
+                        "message": "Could not find any jobs in the provided location."
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                logging.debug(len(jobs))
+                logging.debug("thats the len of jobs")
+
+                ExtractSkillsView.progress = {"processing": True, "num_processed": 0}
+                t = threading.Thread(target=self.extract_skills,args=[jobs, title, location])
+                t.start()
+
+                return Response({
+                            "message": "Extracting skills",
+                            "num_jobs": len(jobs)
+                        }, status=status.HTTP_200_OK)
+
+            except Exception as ex:
+                logging.debug(str(ex))
+                return Response({
+                            "message": str(ex)
+                        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+             return Response({
+                "message": "Skill extracting in progress"
+            }, status=status.HTTP_409_CONFLICT)
+
+    # Progress
+    def get(self, request):
+        return Response({
+            "message": "Skill extraction progress", 
+            "progress": ExtractSkillsView.progress
+        }, status=status.HTTP_200_OK)
+
+    def extract_skills(self, jobs, title, location):
+        try:
+            freq = {}
+            i = 0
+            for job in jobs:
+                description = job.description.lower()
+                description = re.sub("(?:\r\n|\r|\n)", '.', description)
+                description = re.sub("\s+", " ", description)
+                description = re.sub("\.", ".", description)
+
+                sentences = sent_tokenize(description)
+                nouns = []
+                bigrams = []
+                for sentence in sentences:
+                    words = []
+                    pos_words = nltk.pos_tag(word_tokenize(sentence))
+                    for word in pos_words:
+                        if word[0] not in ExtractSkillsView.stop_words and word[0] not in ExtractSkillsView.custom_stopwords and wordnet.synsets(word[0]):
+                            words.append(ExtractSkillsView.lemmatizer.lemmatize(word[0]))
+                            if word[1] == "NN":
+                                nouns.append(ExtractSkillsView.lemmatizer.lemmatize(word[0]))
+                    
+                    for i in range(len(words)-1):
+                        bigrams.append(f"{words[i]} {words[i+1]}")
+                    
+                    for bigram in bigrams:
+                        if bigram not in ExtractSkillsView.custom_stopwords:
+                            if bigram in freq:
+                                freq[bigram] += 1
+                            else:
+                                freq[bigram] = 1
+                    
+                    for noun in nouns:
+                        if noun in freq:
+                            freq[noun] += 1
+                        else:
+                            freq[noun] = 1
+                    
+                    i = i+1
+                    ExtractSkillsView.progress["num_processed"] = i
+
+            skill_location, created = Location.objects.get_or_create(name=location['name'].lower(), lat=location['lat'], lng=location['lng'])
+
+            for key, value in freq.items():
+                if value > len(jobs):
+                    skill, created = Skill.objects.get_or_create(name=key, location=skill_location, job_title=title)
+                    skill.count += value
+                    skill.save()
+
+            jobs.update(scraped=True)
+            ExtractSkillsView.progress["processing"] = False
+
+        except Exception as e:
+            logging.debug("Something went wrong.")
+            logging.debug(e)
+            ExtractSkillsView.progress["processing"] = False
+
+
+    def get_coordinates(self, location, distance):
+        dist = ((math.sqrt(2)/2) * distance)
+        lat = dist/110.574
+        lng = dist/(111.320*math.cos(math.radians(lat)))
+
+        return (location['lat'] - lat,location['lat'] + lat,location['lng'] - lng,location['lng'] + lng)
+
+
+class ListSkillsView(ListAPIView):
+    permission_classes = [IsAdminUser]
+    serializer_class = SkillSerializer
+
+    def get_queryset(self):
+        return Skill.objects.filter(verified=False)[:20]
+
+class UpdateSkillsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        skills = request.data
+        for skill in skills:
+            job_title = JobTitle.objects.filter(name=skill['job_title'])
+            if len(job_title) == 0:
+                logging.debug("could not get job title")
+                continue
+            job_title = job_title[0]
+            query = Skill.objects.filter(name=skill['skill'], job_title=job_title)
+            if len(query) > 0:
+                query = query[0]
+                if skill['value'] == "good":
+                    query.verified = True
+                    query.save()
+                if skill['value'] == "invalid":
+                    InvalidSkill.objects.get_or_create(job_title=job_title, name=skill['skill'], specific=False)
+                    query.delete()
+                if skill['value'] == "invalid2":
+                    InvalidSkill.objects.get_or_create(job_title=job_title, name=skill['skill'], specific=True)
+                    query.delete()
+            else:
+                return Response({
+                    "message": "Could not get skills"
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        new_skills = Skill.objects.filter(verified=False)[:50]
+        new_skill_list = []
+        for skill in new_skills:
+            new_skill_list.append(SkillSerializer(skill).data)
+        return Response({
+                "message": "Successfully updated skills", 
+                "new_skills": new_skill_list
+            }, status=status.HTTP_200_OK)
+
