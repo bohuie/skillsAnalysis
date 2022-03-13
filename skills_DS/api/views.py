@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from django.core.files.storage import FileSystemStorage
+from resume_parser import resumeparse
 from datetime import datetime
 import hashlib
 import logging
