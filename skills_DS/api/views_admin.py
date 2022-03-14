@@ -80,6 +80,7 @@ class ScrapeJobsView(APIView):
                         if(card.get('href') is not None):
                             urls.append('https://ca.indeed.com' + card.get('href'))
                             i+=1
+                            ScrapeJobsView.progress["num_scraped"] = i
 
                 num_workers = 10 if len(urls) < 10 else len(urls)
                 session = FuturesSession(executor=ThreadPoolExecutor(max_workers=num_workers))
