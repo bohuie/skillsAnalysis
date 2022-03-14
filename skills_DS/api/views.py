@@ -39,6 +39,10 @@ class GetUserProfileView(APIView):
 class UpdateUserSkillsView(APIView):
 	def post(self, request):
 		if request.user.is_authenticated:
+			if not hasattr(request.user, "profile"):
+				return Response({
+					"message": "User does not have a profile"
+				}, status=status.HTTP_400_BAD_REQUEST)
 			skills = request.data
 			skills_array = [] 
 			for skill in skills:
