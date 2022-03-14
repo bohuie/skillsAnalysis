@@ -19,12 +19,12 @@ class GetUserProfileView(APIView):
 		if request.user.is_authenticated:
 			if Profile.objects.filter(user = request.user).exists():
 				profile = Profile.objects.filter(user = request.user).values()[0]
-				profile["gender"] = Profile.Gender[profile["gender"]].value
-				profile["yearOfStudy"] = Profile.Year[profile["yearOfStudy"]].value
+				profile["gender"] = Profile.Gender(profile["gender"]).value
+				profile["yearOfStudy"] = Profile.Year(profile["yearOfStudy"]).value
 				profile["full_name"] = request.user.get_full_name()
 				profile["email"] = request.user.email
 				return Response({
-					"message" : "Retrived user profile",
+					"message" : "Successfully retrived user profile",
 					"profile": profile	
 				}, status=status.HTTP_200_OK)
 			else:
