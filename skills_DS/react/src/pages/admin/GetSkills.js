@@ -2,7 +2,6 @@ import axios from "axios"
 import Cookies from "js-cookie"
 import { useState, Fragment } from "react"
 import professions from "professions"
-import { googleMapsKey } from "../../secrets.json"
 import Alert from "../../components/Alert"
 
 const GetSkills = props => {
@@ -21,7 +20,7 @@ const GetSkills = props => {
     event.preventDefault()
     let { position, number, remote, location, radius } = event.target.elements
     axios
-      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${googleMapsKey}`)
+      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${process.env.GOOGLE_MAPS_KEY}`)
       .then(({ data: { results } }) => {
         if (results.length === 0) throw "Could not get location"
         let { address_components } = results[0]
@@ -98,7 +97,7 @@ const GetSkills = props => {
     setExtractError(null)
     let {extractPosition, extractLocation, distance} = event.target.elements
     axios
-      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${extractLocation.value}&key=${googleMapsKey}`)
+      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${extractLocation.value}&key=${process.env.GOOGLE_MAPS_KEY}`)
       .then(({data: {results}}) => {
         if (results.length === 0) throw "Could not get location"
         let {address_components} = results[0]

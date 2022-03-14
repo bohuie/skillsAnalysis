@@ -98,11 +98,11 @@ WSGI_APPLICATION = 'skills_DS.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'skills_analysis',
-        'USER': 'postgres',
-        'PASSWORD': 'example',
-        'HOST': 'postgres',
-        'PORT': '5432',
+        'NAME': os.environ["DB_NAME"],
+        'USER': os.environ["DB_USER"],
+        'PASSWORD': os.environ["DB_PASSWORD"],
+        'HOST': os.environ["DB_HOST"],
+        'PORT': os.environ["DB_PORT"],
     },
     'sqlite': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -162,11 +162,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST ='smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'cosc448atesting@gmail.com'
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = os.environ["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = os.environ["EMAIL_HOST_PASSWORD"]
 
-RECAPTCHA_PUBLIC_KEY = '6LdO6TkeAAAAAAK8gAAuMW0QiCIok1D7nDLtvehg'
-RECAPTCHA_PRIVATE_KEY = '6LdO6TkeAAAAAOxoWMUaB3b2yraNhi2BMEwSDXgl'
+RECAPTCHA_PUBLIC_KEY = os.environ["RECAPTCHA_PUBLIC_KEY"]
+RECAPTCHA_PRIVATE_KEY = os.environ["RECAPTCHA_PRIVATE_KEY"]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
