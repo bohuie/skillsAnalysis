@@ -74,7 +74,7 @@ class ResumeUploadView(APIView):
 					t = threading.Thread(target=self.parse_resume_async,args=[fpath,request])
 					t.start()
 					return Response({
-						"message": "File uploaded, processing"
+						"message": "Successfully uploaded file, processing"
 					}, status=status.HTTP_200_OK)
 				else:
 					return Response({
