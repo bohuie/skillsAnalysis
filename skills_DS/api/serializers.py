@@ -6,5 +6,4 @@ class SkillSerializer(ModelSerializer):
 
 	class Meta:
 		model = Skill
-
 		fields = ('name', 'job_title', )
