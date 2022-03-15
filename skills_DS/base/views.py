@@ -1,27 +1,20 @@
-from django.shortcuts import render, redirect
 from . import forms
-from django.contrib import messages
-from django.contrib.auth.views import LoginView
 from .forms import UserLoginForm
+from .utils import token_generator
+from base.models import Profile
+from rest_framework.response import Response
 
 from django.views import View
-from django.contrib.auth import get_user_model
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib import messages
+from django.contrib.auth import login, get_user_model, authenticate
 from django.contrib.sites.shortcuts import get_current_site
-from .utils import token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes, force_str
-from django.http import HttpResponse
-import hashlib
-from django.core.mail import EmailMessage
-from django.urls import reverse
 
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login
-from django.contrib.auth import authenticate
 from skills_DS.settings import EMAIL_HOST_USER
-from django.shortcuts import get_object_or_404
 
 # Create your views here.
 def register(request):
@@ -112,22 +105,20 @@ def activate(request, uidb64, token):
     if user is not None and token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
+        return Response('Thank you for your email confirmation. Now you can login your account.')
     else:
-        return HttpResponse('Activation link is invalid!')
+        return Response('Activation link is invalid!')
 
 def user_profile(request):
-    try:
-        profile = request.user.profile
-        return render(request,"base/profile.html",{"profile":profile})
-    except:
+    if Profile.objects.filter(user = request.user).exists():
+        return redirect("/profile")
+    else:
         return redirect("/questions")
 
 def login_redirect(request):
-    try:
-        profile = request.user.profile
+    if Profile.objects.filter(user = request.user).exists():
         return redirect("/")
-    except:
+    else:
         return redirect("/questions")
 
 class VerificationView(View):
