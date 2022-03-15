@@ -59,7 +59,7 @@ This is a detailed table showing user & admin permissions on the platform.
 | Upload resume            | Uploading resume to match jobs with similar skillset            | + | + |
 | Resume skills extraction | Extract skills from uploaded resume                             | + | + |
 | Edit skills              | Edit extracted skills from resume                               | + | + |
-| View/Edit profile        | View/Edit user info                                             | - | + |
+| View/Edit profile        | View/Edit user info                                             | + | + |
 | View/Edit settings       | View/Edit user settings and permission                          | - | + |
 | Job scraping             | Fetch jobs from Indeed                                          | - | + |
 | Job skills extraction    | Extract skills from scraped jobs                                | - | + |
