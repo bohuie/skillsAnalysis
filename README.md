@@ -53,13 +53,13 @@ to start all containers. Then navigate to `localhost:8000` to view the webpage.
 
 This is a detailed table showing user & admin permissions on the platform.
 
-| Permissions              | Description                                              |User|Admin|
+| Permissions              | Description                                                    |User|Admin|
 | ------------------------ | --------------------------------------------------------------- |:-:|:-:|
 | Registration             | Registering on the platform with ability to login/logout        | + | + |
 | Upload resume            | Uploading resume to match jobs with similar skillset            | + | + |
 | Resume skills extraction | Extract skills from uploaded resume                             | + | + |
 | Edit skills              | Edit extracted skills from resume                               | + | + |
-| Edit profile             | Edit user info and account permissions                          | - | + |
-| View profile             | View user info and account permissions                          | - | + |
+| View/Edit profile        | View/Edit user info                                             | - | + |
+| View/Edit settings       | View/Edit user settings and permission                          | - | + |
 | Job scraping             | Fetch jobs from Indeed                                          | - | + |
 | Job skills extraction    | Extract skills from scraped jobs                                | - | + |
