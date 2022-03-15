@@ -1,5 +1,5 @@
 import { render, act, fireEvent, cleanup } from '@testing-library/react';
-import Upload from '../components/Upload.js';
+import Upload from '../pages/Upload';
 
 describe("Upload component unit test", () => {
     let component = null;
@@ -13,9 +13,8 @@ describe("Upload component unit test", () => {
 
     it("rendering upload components", () => {
         const { getByTestId } = component;
-        expect(getByTestId("upload-header").textContent).toBe("Upload resume in pdf format");
-        expect(getByTestId("browse-header").textContent).toBe("Browse File");
-        expect(getByTestId("upload-button")).toBeTruthy();
+        expect(getByTestId("upload-header").textContent).toBe("Upload your resume in pdf format");
+        expect(getByTestId("browse-header").textContent).toBe("Browse File ");
     });
     
     it("input pdf file", async () => {

@@ -9,13 +9,13 @@ RUN apt update -y
 RUN apt install dos2unix default-jdk -y
 
 RUN pip3 install --upgrade pip setuptools wheel
+RUN pip3 install -r requirements.txt
+
 RUN dos2unix setup.sh migrate.sh
 RUN chmod +x ./setup.sh
 RUN chmod +x ./migrate.sh
 
 RUN ./setup.sh
-
-RUN pip3 install -r requirements.txt
 
 EXPOSE 8000
 
