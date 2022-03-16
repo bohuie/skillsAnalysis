@@ -181,7 +181,7 @@ class GetJobSkillView(APIView):
 	def post(self, request):
 		if request.data:		
 			jobTitle = request.data['job']
-			jobSkill = Skill.objects.filter(job_title__name =jobTitle, verified = True).values('name','count').order_by('count')[:100]
+			jobSkill = Skill.objects.filter(job_title__name =jobTitle, verified = True).values('name','count').order_by('-count')[:100]
 			return Response({'skills': jobSkill},status=status.HTTP_200_OK)	
 		else:
 			print(request.data)
