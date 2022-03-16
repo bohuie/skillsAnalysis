@@ -1,25 +1,23 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import {BrowserRouter, Routes, Route} from "react-router-dom"
-import App from "./components/App"
-import Questions from "./components/Questions"
-import GetSkills from "./components/admin/GetSkills"
-import BrowseSkills from "./components/admin/BrowseSkills"
-import Upload from "./components/Upload"
-import Profile from "./components/Profile"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import Questions from "./pages/Questions"
+import Upload from "./pages/Upload"
+import Profile from "./pages/Profile"
+import GetSkills from "./pages/admin/GetSkills"
+import BrowseSkills from "./pages/admin/BrowseSkills"
 import WordCloud from "./components/WordCloud"
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/admin/skills" element={<GetSkills />} />
         <Route path="/questions" element={<Questions />} />
-        <Route path="/admin/browse-skills" element={<BrowseSkills />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/word-cloud" element={<WordCloud/>} />
+        <Route path="/admin/skills" element={<GetSkills />} />
+        <Route path="/admin/browse-skills" element={<BrowseSkills />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
