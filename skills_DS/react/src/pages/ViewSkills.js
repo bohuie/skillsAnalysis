@@ -13,16 +13,23 @@ const VS = () => {
       axios
         .get("/api/get-view-skills", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
         .then(({ data }) => {
-            var z;
             console.log(data.success.length)
             var j;
             for(var i = 1; i<data.success.length; i++){
               j = JSON.parse(data.success[0].skills).concat(JSON.parse(data.success[i].skills))
             }
+            
+            var arr =[]
+         
+            for(var i = 0; i<j.length;i++){
+              if(!arr.includes(j[i])){
+                arr.push(j[i])
+              }
+            }
+
             if (data.success.length> 0) {
-              z = j.map((skill, index) => ({ text: skill, value: 30}))
-              console.log(z)
-              ReactDOM.render(<WordCloud data={z} width={150} height={100} rotate={0} padding={0} />, document.getElementById('skill'))
+              arr = arr.map((skill, index) => ({ text: skill, value: 30}))
+              ReactDOM.render(<WordCloud data={arr} width={150} height={100} rotate={0} padding={0} />, document.getElementById('skill'))
             }
             else
                 setError("no profiles yet")
