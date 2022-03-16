@@ -13,7 +13,8 @@ urlpatterns = [
     path('get-profile', views.GetUserProfileView.as_view()),
     path('update-user-skills', views.UpdateUserSkillsView.as_view()),
     path('get-job-titles', views.GetJobTitleView.as_view()),
-    path('get-job-skills',views.GetJobSkillView.as_view())
+    path('get-job-skills',views.GetJobSkillView.as_view()),
+    path('get-view-skills',views.GetAllProfileView.as_view())
 ]
 
 if settings.DEBUG:

@@ -10,6 +10,7 @@ const WC = () => {
   const[job,setJob] = useState(null)
   const [error, setError] = useState(null)
   const [profession,setProfession] = useState(null)
+  const [loading,setLoading]= useState(false)
  
 
   const submit = e => {
@@ -19,14 +20,16 @@ const WC = () => {
       .post("/api/get-job-skills",{job}, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") }})
       .then((s) => {
         data = s.data.skills.map(({name,count}) => ({text: name, value: count}))
-        ReactDOM.render(<div id="root"><WordCloud data={data} width={200} height={200} rotate={0} padding={0} /></div>, document.getElementById('render'))
+        ReactDOM.render(<div id="root"><WordCloud data={data} width={200} height={200} rotate={0} padding={0} /></div>, document.getElementById('render'),c)
       })
       .catch(err => {
         console.error(err)
         setError("unable to get data")
       })
   };
-
+  const c = () =>{
+    setLoading(false)
+  }
   useEffect(() => {
     axios
         .get("/api/get-job-titles", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
@@ -36,25 +39,6 @@ const WC = () => {
         .catch(err => {
           console.error(err)
           setError("database is empty")
-      })
-  }, [])
-
-  useEffect(() => {
-    axios
-      .get("/api/get-profile", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
-      .then(({ data }) => {
-          var z;
-          console.log(data.success.skills.length)
-          if (data.success.skills.length > 2) {
-            z = JSON.parse(data.success.skills).map((skill, index) => ({ text: skill, value: 100}))
-            ReactDOM.render(<WordCloud data={z} width={150} height={100} rotate={0} padding={0} />, document.getElementById('skill'))
-          }
-          else
-              setError("no profile yet")
-      })
-      .catch(err => {
-          console.error(err)
-          setError("no profile yet")
       })
   }, [])
 
@@ -80,13 +64,18 @@ const WC = () => {
             </select>
           </div>
           <div className="button">
-            <button type="submit" className="btn btn-primary" disabled = {!profession}>Enter</button>
+            <button type="submit" className="btn btn-primary" disabled = {!profession} onClick={() => {setLoading(true)}}>Enter</button>
           </div>
         </form>
       </div>
-      <div id="render" ></div>
-      <h1>Your skills: {error}</h1>
-      <div id="skill"></div>
+      <div>
+      {
+        loading ? (<h3>loading...</h3>):(<div></div>)
+      }
+      </div>
+      <div id="render" >
+              
+      </div>
     </Fragment>
   )
 
