@@ -13,7 +13,6 @@ import threading
 import contextlib
 import os
 from rest_framework.permissions import IsAdminUser
-from .job_scraping import get_jobs
 from .skills_extraction import extract_skills
 from .serializers import SkillSerializer
 from .models import JobPosting, JobTitle, Skill, InvalidSkill
