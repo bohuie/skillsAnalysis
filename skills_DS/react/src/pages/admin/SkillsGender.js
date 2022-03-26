@@ -60,7 +60,6 @@ const SkillsGender = () => {
             const fiveSkills = { skills: [] }
             const fivePlusSkills = { skills: [] }
             let temp
-            console.log(result.data.profile)
             result.data.profile.map((data, index) => {
                 switch (data.gender) {
                     case "Male":
