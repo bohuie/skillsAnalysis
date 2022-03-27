@@ -17,7 +17,8 @@ class CustomAdminSite(admin.AdminSite):
 		return [
     		path('skills/', self.admin_view(self.skills_view)),
 			path('browse-skills/', self.admin_view(self.skills_view)),
-			path('skills-gender/', self.admin_view(self.skills_view))
+			path('skills-gender/', self.admin_view(self.skills_view)),
+			path('skills-year/', self.admin_view(self.skills_view))
 		] + super().get_urls()
 	
 	def skills_view(self, request):

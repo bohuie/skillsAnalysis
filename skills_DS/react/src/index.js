@@ -7,6 +7,7 @@ import Profile from "./pages/Profile"
 import GetSkills from "./pages/admin/GetSkills"
 import BrowseSkills from "./pages/admin/BrowseSkills"
 import SkillsGender from "./pages/admin/SkillsGender"
+import SkillsYear from "./pages/admin/SkillsYear"
 
 ReactDOM.render(
   <React.StrictMode>
@@ -18,6 +19,7 @@ ReactDOM.render(
         <Route path="/admin/skills" element={<GetSkills />} />
         <Route path="/admin/browse-skills" element={<BrowseSkills />} />
         <Route path="/admin/skills-gender" element={<SkillsGender />} />
+        <Route path="/admin/skills-year" element={<SkillsYear />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

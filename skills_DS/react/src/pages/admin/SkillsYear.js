@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import d3 from 'd3';
 import WordCloud from "react-d3-cloud";
 
-const SkillsGender = () => {
+const SkillsYear = () => {
 
     const [data, setData] = useState({});
 
@@ -15,24 +15,32 @@ const SkillsGender = () => {
         axios.get("/api/skills-gender", {
             headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") }
         }).then((result) => {
-            const maleSkills = { skills: [] }
-            const femaleSkills = { skills: [] }
-            const othersSkills = { skills: [] }
-            const preferNotToSaySkills = { skills: [] }
+            const oneSkills = { skills: [] }
+            const twoSkills = { skills: [] }
+            const threeSkills = { skills: [] }
+            const fourSkills = { skills: [] }
+            const fiveSkills = { skills: [] }
+            const fivePlusSkills = { skills: [] }
             let temp
             result.data.profile.map((data, index) => {
-                switch (data.gender) {
-                    case "Male":
-                        temp = maleSkills
-                        break;
-                    case "Female":
-                        temp = femaleSkills
-                        break;
-                    case "Others":
-                        temp = othersSkills
-                        break;
+                switch (data.yearOfStudy) {
+                    case "One":
+                        temp = oneSkills
+                        break
+                    case "Two":
+                        temp = twoSkills
+                        break
+                    case "Three":
+                        temp = threeSkills
+                        break
+                    case "Four":
+                        temp = fourSkills
+                        break
+                    case "Five":
+                        temp = fiveSkills
+                        break
                     default:
-                        temp = preferNotToSaySkills
+                        temp = fivePlusSkills
                 }
                 JSON.parse(data.skills).map((skill, index) => {
                     if (temp.skills.length === 0) return temp.skills.push({ text: skill, value: 30 })
@@ -43,10 +51,12 @@ const SkillsGender = () => {
                 })
             });
             setData({
-                male: maleSkills,
-                female: femaleSkills,
-                others: othersSkills,
-                preferNotToSay: preferNotToSaySkills,
+                one: oneSkills,
+                two: twoSkills,
+                three: threeSkills,
+                four: fourSkills,
+                five: fiveSkills,
+                fivePlus: fivePlusSkills,
             })
         }).catch((error) => {
             console.log(error)
@@ -55,11 +65,12 @@ const SkillsGender = () => {
 
     useEffect(() => {
         if (Object.keys(data).length === 0) return;
-        ReactDOM.render(<WordCloud data={data.male.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('maleSkill'))
-        ReactDOM.render(<WordCloud data={data.female.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('femaleSkill'))
-        ReactDOM.render(<WordCloud data={data.others.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('othersSkill'))
-        ReactDOM.render(<WordCloud data={data.preferNotToSay.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('preferNotToSaySkill'))
-
+        ReactDOM.render(<WordCloud data={data.one.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('oneSkill'))
+        ReactDOM.render(<WordCloud data={data.two.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('twoSkill'))
+        ReactDOM.render(<WordCloud data={data.three.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('threeSkill'))
+        ReactDOM.render(<WordCloud data={data.four.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('fourSkill'))
+        ReactDOM.render(<WordCloud data={data.five.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('fiveSkill'))
+        ReactDOM.render(<WordCloud data={data.fivePlus.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('fivePlusSkill'))
         // ReactDOM.render(<WordCloud data={arrMale} width={150} height={100} rotate={0} padding={0} />, document.getElementById('maleSkill'))
         // ReactDOM.render(<WordCloud data={arrFemale} width={150} height={100} rotate={0} padding={0} />, document.getElementById('femaleSkill'))
         // ReactDOM.render(<WordCloud data={arrOthers} width={150} height={100} rotate={0} padding={0} />, document.getElementById('othersSkill'))
@@ -86,25 +97,32 @@ const SkillsGender = () => {
             {/* <svg ref={d3Chart}></svg> */}
             <Fragment>
                 <div>
-                    <h2>Male</h2>
-                    <div id="maleSkill"></div>
+                    <h2>1st Year</h2>
+                    <div id="oneSkill"></div>
                 </div>
                 <div>
-                    <h2>Female</h2>
-                    <div id="femaleSkill"></div>
+                    <h2>2nd Year</h2>
+                    <div id="twoSkill"></div>
                 </div>
                 <div>
-                    <h2>Others</h2>
-                    <div id="othersSkill"></div>
+                    <h2>3rd Year</h2>
+                    <div id="threeSkill"></div>
                 </div>
                 <div>
-                    <h2>PreferNotToSay</h2>
-                    <div id="preferNotToSaySkill"></div>
+                    <h2>4th Year</h2>
+                    <div id="fourSkill"></div>
                 </div>
-
+                <div>
+                    <h2>5th Year</h2>
+                    <div id="fiveSkill"></div>
+                </div>
+                <div>
+                    <h2>5+ Year</h2>
+                    <div id="fivePlusSkill"></div>
+                </div>
             </Fragment>
         </div>
     )
 }
 
-export default SkillsGender
+export default SkillsYear
