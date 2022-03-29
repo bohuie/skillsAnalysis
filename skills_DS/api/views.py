@@ -50,7 +50,7 @@ class GetJobsView(APIView):
 		remote = request.data['remote']
 		num = int(request.data['number'])
 		radius = int(request.data['radius'])
-		get_jobs(position, location, num, country, remote, radius)
+		#get_jobs(position, location, num, country, remote, radius)
 		return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 
 class GetSkillsView(APIView):
@@ -157,6 +157,14 @@ class ResumeUploadView(APIView):
 		skills = []
 		for skill in data['skills']:
 			skills.append(skill.strip())
+
+		skillsCurrent = list(Profile.objects.filter(user=request.user).values_list('skills',flat=True))
+		y = json.loads(skillsCurrent[0])
+
+		if(len(y) > 0):
+			for skill in y:
+				if skill not in skills:
+					skills.append(skill)
 
 		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
 		Profile.objects.filter(user = request.user).update(resume_processing = False)

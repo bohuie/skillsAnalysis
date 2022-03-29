@@ -15,9 +15,14 @@ const VS = () => {
         .then(({ data }) => {
             console.log(data.success.length)
             var j;
-            for(var i = 1; i<data.success.length; i++){
-              j = JSON.parse(data.success[0].skills).concat(JSON.parse(data.success[i].skills))
+            if(data.success.length > 1){
+              for(var i = 1; i<data.success[0].skills.length; i++){
+                j = JSON.parse(data.success[0].skills).concat(JSON.parse(data.success[i].skills))
+              }
+            }else{
+              j = JSON.parse(data.success[0].skills)
             }
+            
             
             var arr =[]
          
