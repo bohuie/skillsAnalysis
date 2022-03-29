@@ -108,7 +108,7 @@ const Upload = () => {
       {pdfFile && (
         <div className="shadow p-3 mb-5 bg-white rounded">
           <div>
-            <button className="btn btn-success w-100" onClick={handleSubmission}>
+            <button data-testid="submit-button" className="btn btn-success w-100" onClick={handleSubmission}>
               Submit
             </button>
           </div>
