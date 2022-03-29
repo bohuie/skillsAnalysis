@@ -166,6 +166,9 @@ class ResumeUploadView(APIView):
 				if skill not in skills:
 					skills.append(skill)
 
+		if '' in skills:
+			skills.remove('')
+			
 		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
 		Profile.objects.filter(user = request.user).update(resume_processing = False)
 		
