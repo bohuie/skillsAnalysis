@@ -1,15 +1,15 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useRef } from "react";
 import ReactDOM from 'react-dom';
-import d3 from 'd3';
+import * as d3 from 'd3';
 import WordCloud from "react-d3-cloud";
 
 const SkillsGender = () => {
 
     const [data, setData] = useState({});
 
-    // const d3Chart = useRef()
+    const svgRef = useRef();
 
     useEffect(() => {
         axios.get("/api/skills-gender", {
@@ -60,30 +60,50 @@ const SkillsGender = () => {
         ReactDOM.render(<WordCloud data={data.others.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('othersSkill'))
         ReactDOM.render(<WordCloud data={data.preferNotToSay.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('preferNotToSaySkill'))
 
-        // ReactDOM.render(<WordCloud data={arrMale} width={150} height={100} rotate={0} padding={0} />, document.getElementById('maleSkill'))
-        // ReactDOM.render(<WordCloud data={arrFemale} width={150} height={100} rotate={0} padding={0} />, document.getElementById('femaleSkill'))
-        // ReactDOM.render(<WordCloud data={arrOthers} width={150} height={100} rotate={0} padding={0} />, document.getElementById('othersSkill'))
-        // ReactDOM.render(<WordCloud data={arrPreferNotToSay} width={150} height={100} rotate={0} padding={0} />, document.getElementById('preferNotToSaySkill'))
-        // console.log(skills)
-        // const margin = {top:50, right:50, bottom:50, left:50}
-        // const chartHeight = parseInt(d3.select('#d3demo').style('height')) - margin.top - margin.bottom
-        // const chartWidth = parseInt(d3.select('#d3demo').style('width')) - margin.left - margin.right
+        // Histogram
+        const w = 1200;
+        const h = 300;
 
-        // const svg = d3.select(d3Chart.current)
-        //     .attr('width', chartWidth + margin.left + margin.right)
-        //     .attr('height', chartHeight + margin.top + margin.bottom)
+        const svg = d3.select(svgRef.current)
+            .attr('width', w)
+            .attr('height', h)
+            .style('overflow', 'visible')
+            .style('margin-top', '75px');
 
-        // const x = d3.scaleBand()
-        //     .domain(d3.range(data.length))
-        //     .range([magin.left, chartWidth - margin.right])
+        const xScale = d3.scaleBand()
+            .domain(data.male.skills.map((val, i) => val.text))
+            .range([0, w])
+            .padding(0.5);
 
-        // svg.append('g')
-        //     .attr('transform', `translate(0, ${chartHeight - margin.bottom})`)
+        const yScale = d3.scaleLinear()
+            .domain([0, h])
+            .range([h, 0]);
+
+        const xAxis = d3.axisBottom(xScale)
+            .ticks(data.male.skills.length)
+        
+        const yAxis = d3.axisLeft(yScale)
+            .ticks(5);
+
+        svg.append('g')
+            .call(xAxis)
+            .attr('transform', `translate(0, ${h})`);
+        
+        svg.append('g')
+            .call(yAxis);
+        
+        svg.selectAll('.bar')
+            .data(data.male.skills)
+            .join('rect')
+                .attr('x', val => xScale(val.text))
+                .attr('y', val => yScale(val.value))
+                .attr('width', xScale.bandwidth())
+                .attr('height', val => h - yScale(val.value));
+
     }, [data])
 
     return (
         <div>
-            {/* <svg ref={d3Chart}></svg> */}
             <Fragment>
                 <div>
                     <h2>Male</h2>
@@ -101,7 +121,9 @@ const SkillsGender = () => {
                     <h2>PreferNotToSay</h2>
                     <div id="preferNotToSaySkill"></div>
                 </div>
-
+            </Fragment>
+            <Fragment>
+                <svg ref={svgRef}></svg>
             </Fragment>
         </div>
     )
