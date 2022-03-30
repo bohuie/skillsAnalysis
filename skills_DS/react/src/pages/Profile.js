@@ -9,6 +9,7 @@ const Profile = props => {
         type: "",
         message: ""
     });
+    const [timestamp, setTimestamp] = useState('');
     const [skills, setSkills] = useState([]);
     const [profile, setProfile] = useState({
         full_name: '',
@@ -44,7 +45,7 @@ const Profile = props => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post("/api/update-user-skills", skills, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
+        axios.post("/api/update-user-skills", { 'timestamp': timestamp, 'skills': skills }, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
             .then((response) => {
                 console.log(response);
                 setAlert({
@@ -66,6 +67,7 @@ const Profile = props => {
     }
 
     useEffect(() => {
+
         axios.get("/api/get-profile", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
             .then((response) => {
                 console.log(response);
@@ -76,12 +78,14 @@ const Profile = props => {
                     gender: profile.gender,
                     age: profile.age,
                     year_of_study: profile.yearOfStudy,
-                })
+                });
+                let t = Object.keys(profile.skills).reduce((a, b) => a > b ? a : b);
                 setSkills(
-                    JSON.parse(profile.skills).map((skill, index) => (
+                    profile.skills[t].map((skill, index) => (
                         { id: index, value: skill }
                     ))
                 );
+                setTimestamp(t);
             })
             .catch((error) => {
                 console.error(error);
@@ -103,7 +107,7 @@ const Profile = props => {
                 message={alert.message}
                 handleDismiss={dismissAlert}
             />
-            
+
             <div className="shadow p-3 mt-5 mb-5 bg-white rounded">
                 <table className="table">
                     <tbody>
