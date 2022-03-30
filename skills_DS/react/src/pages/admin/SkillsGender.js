@@ -73,7 +73,7 @@ const SkillsGender = () => {
         const xScale = d3.scaleBand()
             .domain(data.male.skills.map((val, i) => val.text))
             .range([0, w])
-            .padding(0.5);
+            .padding(0.9);
 
         const yScale = d3.scaleLinear()
             .domain([0, h])
@@ -81,24 +81,30 @@ const SkillsGender = () => {
 
         const xAxis = d3.axisBottom(xScale)
             .ticks(data.male.skills.length)
-        
+
         const yAxis = d3.axisLeft(yScale)
             .ticks(5);
 
         svg.append('g')
             .call(xAxis)
-            .attr('transform', `translate(0, ${h})`);
-        
+            .attr('transform', `translate(0, ${h})`)
+            .selectAll("text")
+            .attr('y', 0)
+            .attr('x', 9)
+            .attr('dy', '.35em')
+            .attr('transform', 'rotate(90)')
+            .style('text-anchor', 'start');
+
         svg.append('g')
             .call(yAxis);
-        
+
         svg.selectAll('.bar')
             .data(data.male.skills)
             .join('rect')
-                .attr('x', val => xScale(val.text))
-                .attr('y', val => yScale(val.value))
-                .attr('width', xScale.bandwidth())
-                .attr('height', val => h - yScale(val.value));
+            .attr('x', val => xScale(val.text))
+            .attr('y', val => yScale(val.value))
+            .attr('width', xScale.bandwidth())
+            .attr('height', val => h - yScale(val.value));
 
     }, [data])
 
