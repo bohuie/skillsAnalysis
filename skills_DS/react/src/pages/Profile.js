@@ -2,21 +2,26 @@ import axios from "axios"
 import Cookies from "js-cookie"
 import { useState, Fragment, useEffect } from "react"
 import Alert from "../components/Alert";
+import SankeyChart from "../components/SankeyChart";
 
 const Profile = props => {
+    const data = `[{"source":"javascript","target":"Software Development Engineer","frequency":512,"value":56,"time":1},{"source":"sql","target":"Software Development Engineer","frequency":431,"value":47,"time":1},{"source":"kubernetes","target":"Software Development Engineer","frequency":160,"value":17,"time":1},{"source":"work remotely","target":"Software Development Engineer","frequency":155,"value":17,"time":1},{"source":"problem solving","target":"Data Scientist","frequency":147,"value":24,"time":1},{"source":"cad","target":"Electronic Engineer","frequency":118,"value":17,"time":1},{"source":"technical support","target":"Electronic Engineer","frequency":107,"value":15,"time":1},{"source":"work remotely","target":"Electronic Engineer","frequency":106,"value":15,"time":1},{"source":"audit","target":"Finance","frequency":199,"value":36,"time":1},{"source":"financial services","target":"Finance","frequency":158,"value":28,"time":1},{"source":"financial analyst","target":"Finance","frequency":128,"value":23,"time":1},{"source":"risk management","target":"Finance","frequency":127,"value":23,"time":1},{"source":"vendor","target":"Project Manager","frequency":246,"value":33,"time":1},{"source":"construction management","target":"Project Manager","frequency":132,"value":17,"time":1},{"source":"organizational skills","target":"Project Manager","frequency":109,"value":14,"time":1},{"source":"management skills","target":"Customer Support","frequency":89,"value":9,"time":1}]`;
+    const data_obj = JSON.parse(data);
     const [alert, setAlert] = useState({
         visible: false,
         type: "",
         message: ""
     });
-    const [timestamp, setTimestamp] = useState('');
+    const [timestamps, setTimeStamps] = useState([]);
+    const [current_timestamp, setCurrentTimestamp] = useState('');
     const [skills, setSkills] = useState([]);
     const [profile, setProfile] = useState({
         full_name: '',
         email: '',
         gender: '',
         age: '',
-        year_of_study: ''
+        year_of_study: '',
+        skills: ''
     });
 
     const dismissAlert = () => {
@@ -43,9 +48,18 @@ const Profile = props => {
         setSkills(newSkills);
     }
 
+    const handleVersionChange = (t) => {
+        setCurrentTimestamp(t);
+        setSkills(
+            profile.skills[t.timestamp].map((skill, index) => (
+                { id: index, value: skill }
+            ))
+        );
+    }
+
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post("/api/update-user-skills", { 'timestamp': timestamp, 'skills': skills }, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
+        axios.post("/api/update-user-skills", { 'timestamp': current_timestamp.timestamp, 'skills': skills }, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
             .then((response) => {
                 console.log(response);
                 setAlert({
@@ -67,25 +81,29 @@ const Profile = props => {
     }
 
     useEffect(() => {
-
         axios.get("/api/get-profile", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
             .then((response) => {
                 console.log(response);
-                let profile = response.data.profile;
+                let r_profile = response.data.profile;
                 setProfile({
-                    full_name: profile.full_name,
-                    email: profile.email,
-                    gender: profile.gender,
-                    age: profile.age,
-                    year_of_study: profile.yearOfStudy,
+                    full_name: r_profile.full_name,
+                    email: r_profile.email,
+                    gender: r_profile.gender,
+                    age: r_profile.age,
+                    year_of_study: r_profile.yearOfStudy,
+                    skills: r_profile.skills
                 });
-                let t = Object.keys(profile.skills).reduce((a, b) => a > b ? a : b);
+                //let t = Object.keys(r_profile.skills).reduce((a, b) => a > b ? a : b);
+                let t = Object.keys(r_profile.skills).sort().map((val, index) => {
+                    return { version: index + 1, timestamp: val }
+                });
+                setTimeStamps(t);
+                setCurrentTimestamp(t[0]);
                 setSkills(
-                    profile.skills[t].map((skill, index) => (
+                    r_profile.skills[t[0].timestamp].map((skill, index) => (
                         { id: index, value: skill }
                     ))
                 );
-                setTimestamp(t);
             })
             .catch((error) => {
                 console.error(error);
@@ -98,6 +116,7 @@ const Profile = props => {
                 });
             });
     }, [])
+
 
     return (
         <Fragment>
@@ -136,8 +155,25 @@ const Profile = props => {
                     <table className="table">
                         <thead>
                             <tr>
-                                <th scope="col">Skills</th>
-                                <th scope="col"></th>
+                                <th scope="col">{"Skills - Resume v" + current_timestamp.version}</th>
+                                <th scope="col">
+                                    <div class="dropdown form-check w-100">
+                                        <button class="btn btn-primary dropdown-toggle w-100" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                                            Select resume version
+                                        </button>
+                                        <div class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
+                                            {
+                                                timestamps.map((t, index) => {
+                                                    return (
+                                                        <button class="dropdown-item" type="button" onClick={() => handleVersionChange(t)}>
+                                                            {"v" + t.version + " - " + new Date(t.timestamp * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                                        </button>
+                                                    )
+                                                })
+                                            }
+                                        </div>
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -174,6 +210,25 @@ const Profile = props => {
                         </tbody>
                     </table>
                 </form>
+            </div>
+            <div className="shadow p-3 mb-5 bg-white rounded">
+                <div className="App">
+                    <SankeyChart
+                        links={data_obj}
+                        nodeGroup={d => d.id.split(/\W/)[0]} // take first word for color
+                        nodeAlign={'justify'} // e.g., d3.sankeyJustify; set by input above
+                        linkColor='source-target' // e.g., "source" or "target"; set by input above
+                        //format={(f => d => `${f(d)} occurences`)(d3.format(",.1~f"))}
+                        nodePadding={5}
+                        linkStrokeOpacity={0.4}
+                        width={1080}
+                        height={2560}
+                        marginRight={10}
+                        marginLeft={10}
+                        marginTop={10}
+                        marginBottom={10}
+                    />
+                </div>
             </div>
         </Fragment >
     )

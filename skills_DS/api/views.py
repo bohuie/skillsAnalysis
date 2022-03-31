@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from django.core.files.storage import FileSystemStorage
+from django.db.models import OuterRef, Subquery
 from resume_parser import resumeparse
 from datetime import datetime
 import hashlib
@@ -195,6 +196,17 @@ class GetJobSkillView(APIView):
 		else:
 			print(request.data)
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+	
+	def get(self, request):
+		top_skills_per_job = Skill.objects.filter(
+    			job_title_id=OuterRef('job_title_id'),
+				verified = True
+			).order_by('-count')[:20]
+		top_skills = Skill.objects.filter(
+				id__in=Subquery(top_skills_per_job.values('id'))
+			).values('name','count', 'job_title__name') 
+		return Response({'skills': top_skills},status=status.HTTP_200_OK)	
+
 
 class GetAllProfileView(APIView):
 	def get(self, request, format=None):
