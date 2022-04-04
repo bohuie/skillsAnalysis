@@ -88,7 +88,6 @@ const Questions = props => {
                     <option value="Two">2</option>
                     <option value="Three">3</option>
                     <option value="Four">4</option>
-                    <option value="Five">5</option>
                     <option value="Fivep">5+</option>
                   </select>
                 </td>
