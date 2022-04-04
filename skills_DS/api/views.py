@@ -50,7 +50,7 @@ class GetJobsView(APIView):
 		remote = request.data['remote']
 		num = int(request.data['number'])
 		radius = int(request.data['radius'])
-		#get_jobs(position, location, num, country, remote, radius)
+		get_jobs(position, location, num, country, remote, radius)
 		return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
 
 class GetSkillsView(APIView):
