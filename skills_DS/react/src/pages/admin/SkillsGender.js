@@ -10,6 +10,7 @@ const SkillsGender = () => {
     const [data, setData] = useState();
     const [newData, setNewData] = useState([]);
     const [filter, setFilter] = useState("Male");
+    const [filter2, setFilter2] = useState("");
 
     const svgRef = useRef();
 
@@ -99,6 +100,13 @@ const SkillsGender = () => {
     useEffect(() => {
         if (newData.length === 0) return
 
+        let filteredData = newData
+        if (filter2) {
+            const topNum = parseInt(filter2)
+            const temp = filteredData.filter((d) => d.values.some((e) => e.value >= topNum))
+            filteredData = temp.length === 0 ? newData : temp
+        }
+
         const margin = { top: 50, right: 5, bottom: 200, left: 30 }
         const width = 1200 - margin.left - margin.right
         const height = 600 - margin.top - margin.bottom
@@ -108,7 +116,7 @@ const SkillsGender = () => {
         const y = d3.scaleLinear().rangeRound([height, 0]);
 
         const xAxis = d3.axisBottom().scale(x0)
-            .tickValues(newData.map(d => d.category))
+            .tickValues(filteredData.map(d => d.category))
 
         const yAxis = d3.axisLeft().scale(y);
 
@@ -120,12 +128,12 @@ const SkillsGender = () => {
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        const categoriesNames = newData.map((d) => d.category);
-        const rateNames = newData[0].values.map((d) => d.group);
+        const categoriesNames = filteredData.map((d) => d.category);
+        const groupNames = filteredData[0].values.map((d) => d.group);
 
         x0.domain(categoriesNames);
-        x1.domain(rateNames).rangeRound([0, x0.bandwidth()]);
-        y.domain([0, d3.max(newData, (category) => { return d3.max(category.values, (d) => { return d.value; }); })]);
+        x1.domain(groupNames).rangeRound([0, x0.bandwidth()]);
+        y.domain([0, d3.max(filteredData, (category) => { return d3.max(category.values, (d) => { return d.value; }); })]);
 
         svg.append("g")
             .attr("class", "x axis")
@@ -137,6 +145,7 @@ const SkillsGender = () => {
             .attr('dy', '.35em')
             .attr('transform', 'rotate(90)')
             .style('text-anchor', 'start');
+
 
         svg.append("g")
             .attr("class", "y axis")
@@ -153,7 +162,7 @@ const SkillsGender = () => {
         svg.select('.y').transition().duration(500).delay(1300).style('opacity', '1');
 
         const slice = svg.selectAll(".slice")
-            .data(newData)
+            .data(filteredData)
             .enter().append("g")
             .attr("class", "g")
             .attr("transform", (d) => "translate(" + x0(d.category) + ",0)");
@@ -176,7 +185,7 @@ const SkillsGender = () => {
 
         //Legend
         const legend = svg.selectAll(".legend")
-            .data(newData[0].values.map((d) => d.group).reverse())
+            .data(filteredData[0].values.map((d) => d.group).reverse())
             .enter().append("g")
             .attr("class", "legend")
             .attr("transform", (d, i) => "translate(0," + i * 20 + ")")
@@ -196,7 +205,8 @@ const SkillsGender = () => {
             .text((d) => d);
 
         legend.transition().duration(500).delay((d, i) => 1300 + 100 * i).style("opacity", "1");
-    }, [newData])
+
+    }, [newData, filter2])
 
     useEffect(() => {
         if (!filter) return
@@ -249,8 +259,9 @@ const SkillsGender = () => {
                 textAlign: "center",
                 color: "black"
             }}>Histogram</h1>
+            <input className="form-control" type="number" placeholder="Above Filter" onChange={(e) => { setFilter2(e.target.value) }}></input>
             <Fragment>
-                <svg ref={svgRef}></svg>
+                <svg ref={svgRef} key={filter2}></svg>
             </Fragment>
         </>
     )
