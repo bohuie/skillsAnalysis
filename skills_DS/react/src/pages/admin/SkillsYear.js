@@ -18,7 +18,6 @@ const SkillsYear = () => {
         axios.get("/api/skills-gender", {
             headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") }
         }).then((result) => {
-            console.log(result)
             const oneSkills = { skills: [] }
             const twoSkills = { skills: [] }
             const threeSkills = { skills: [] }
