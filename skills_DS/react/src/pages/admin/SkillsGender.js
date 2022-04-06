@@ -7,7 +7,9 @@ import WordCloud from "react-d3-cloud";
 
 const SkillsGender = () => {
 
-    const [data, setData] = useState({});
+    const [data, setData] = useState();
+    const [newData, setNewData] = useState([]);
+    const [filter, setFilter] = useState("Male");
 
     const svgRef = useRef();
 
@@ -20,19 +22,25 @@ const SkillsGender = () => {
             const othersSkills = { skills: [] }
             const preferNotToSaySkills = { skills: [] }
             let temp
+            let temp2 = []
+            let tempNum
             result.data.profile.map((data, index) => {
                 switch (data.gender) {
                     case "Male":
                         temp = maleSkills
+                        tempNum = 0
                         break;
                     case "Female":
                         temp = femaleSkills
+                        tempNum = 1
                         break;
                     case "Others":
                         temp = othersSkills
+                        tempNum = 2
                         break;
                     default:
                         temp = preferNotToSaySkills
+                        tempNum = 3
                 }
                 JSON.parse(data.skills).map((skill, index) => {
                     if (temp.skills.length === 0) return temp.skills.push({ text: skill, value: 30 })
@@ -41,6 +49,40 @@ const SkillsGender = () => {
                         else if (i === temp.skills.length - 1) return temp.skills.push({ text: skill, value: 30 })
                     }
                 })
+
+                // histogram data
+                JSON.parse(data.skills).map((skill, index) => {
+                    if (temp2.length === 0) {
+                        temp2.push({
+                            category: skill,
+                            values: [
+                                { value: 0, group: "male" },
+                                { value: 0, group: "female" },
+                                { value: 0, group: "others" },
+                                { value: 0, group: "prefer not to say" }
+                            ]
+                        })
+                        temp2[0].values[tempNum].value += 1
+                        return
+                    }
+                    for (let i = 0; i < temp2.length; i++) {
+                        if (temp2[i].category === skill) return temp2[i].values[tempNum].value += 1
+                        else if (i === temp2.length - 1) {
+                            temp2.push({
+                                category: skill,
+                                values: [
+                                    { value: 0, group: "male" },
+                                    { value: 0, group: "female" },
+                                    { value: 0, group: "others" },
+                                    { value: 0, group: "prefer not to say" }
+                                ]
+                            })
+                            temp2[temp2.length - 1].values[tempNum].value += 1
+                            return
+                        }
+                    }
+
+                })
             });
             setData({
                 male: maleSkills,
@@ -48,46 +90,47 @@ const SkillsGender = () => {
                 others: othersSkills,
                 preferNotToSay: preferNotToSaySkills,
             })
+            setNewData(temp2)
         }).catch((error) => {
             console.log(error)
         })
     }, [])
 
     useEffect(() => {
-        if (Object.keys(data).length === 0) return;
-        ReactDOM.render(<WordCloud data={data.male.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('maleSkill'))
-        ReactDOM.render(<WordCloud data={data.female.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('femaleSkill'))
-        ReactDOM.render(<WordCloud data={data.others.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('othersSkill'))
-        ReactDOM.render(<WordCloud data={data.preferNotToSay.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('preferNotToSaySkill'))
+        if (newData.length === 0) return
 
-        // Histogram
-        const w = 1200;
-        const h = 300;
+        const margin = { top: 50, right: 5, bottom: 200, left: 30 }
+        const width = 1200 - margin.left - margin.right
+        const height = 600 - margin.top - margin.bottom
+
+        const x0 = d3.scaleBand().rangeRound([0, width], .5);
+        const x1 = d3.scaleBand();
+        const y = d3.scaleLinear().rangeRound([height, 0]);
+
+        const xAxis = d3.axisBottom().scale(x0)
+            .tickValues(newData.map(d => d.category))
+
+        const yAxis = d3.axisLeft().scale(y);
+
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
 
         const svg = d3.select(svgRef.current)
-            .attr('width', w)
-            .attr('height', h)
-            .style('overflow', 'visible')
-            .style('margin-top', '75px');
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        const xScale = d3.scaleBand()
-            .domain(data.male.skills.map((val, i) => val.text))
-            .range([0, w])
-            .padding(0.9);
+        const categoriesNames = newData.map((d) => d.category);
+        const rateNames = newData[0].values.map((d) => d.group);
 
-        const yScale = d3.scaleLinear()
-            .domain([0, h])
-            .range([h, 0]);
+        x0.domain(categoriesNames);
+        x1.domain(rateNames).rangeRound([0, x0.bandwidth()]);
+        y.domain([0, d3.max(newData, (category) => { return d3.max(category.values, (d) => { return d.value; }); })]);
 
-        const xAxis = d3.axisBottom(xScale)
-            .ticks(data.male.skills.length)
-
-        const yAxis = d3.axisLeft(yScale)
-            .ticks(5);
-
-        svg.append('g')
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
             .call(xAxis)
-            .attr('transform', `translate(0, ${h})`)
             .selectAll("text")
             .attr('y', 0)
             .attr('x', 9)
@@ -95,43 +138,121 @@ const SkillsGender = () => {
             .attr('transform', 'rotate(90)')
             .style('text-anchor', 'start');
 
-        svg.append('g')
-            .call(yAxis);
+        svg.append("g")
+            .attr("class", "y axis")
+            .style('opacity', '0')
+            .call(yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .style('font-weight', 'bold')
+            .text("Value");
 
-        svg.selectAll('.bar')
-            .data(data.male.skills)
-            .join('rect')
-            .attr('x', val => xScale(val.text))
-            .attr('y', val => yScale(val.value))
-            .attr('width', xScale.bandwidth())
-            .attr('height', val => h - yScale(val.value));
+        svg.select('.y').transition().duration(500).delay(1300).style('opacity', '1');
 
-    }, [data])
+        const slice = svg.selectAll(".slice")
+            .data(newData)
+            .enter().append("g")
+            .attr("class", "g")
+            .attr("transform", (d) => "translate(" + x0(d.category) + ",0)");
+
+        slice.selectAll("rect")
+            .data((d) => d.values)
+            .enter().append("rect")
+            .attr("width", x1.bandwidth())
+            .attr("x", (d) => x1(d.group))
+            .style("fill", (d) => color(d.group))
+            .attr("y", (d) => y(0))
+            .attr("height", (d) => height - y(0))
+
+        slice.selectAll("rect")
+            .transition()
+            .delay((d) => Math.random() * 1000)
+            .duration(1000)
+            .attr("y", (d) => y(d.value))
+            .attr("height", (d) => height - y(d.value));
+
+        //Legend
+        const legend = svg.selectAll(".legend")
+            .data(newData[0].values.map((d) => d.group).reverse())
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", (d, i) => "translate(0," + i * 20 + ")")
+            .style("opacity", "0");
+
+        legend.append("rect")
+            .attr("x", width - 18)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", (d) => color(d));
+
+        legend.append("text")
+            .attr("x", width - 24)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text((d) => d);
+
+        legend.transition().duration(500).delay((d, i) => 1300 + 100 * i).style("opacity", "1");
+    }, [newData])
+
+    useEffect(() => {
+        if (!filter) return
+        if (!data) return
+        switch (filter) {
+            case 'Male':
+                ReactDOM.render(<WordCloud data={data.male.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
+                break
+            case 'Female':
+                ReactDOM.render(<WordCloud data={data.female.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
+                break
+            case 'Others':
+                ReactDOM.render(<WordCloud data={data.others.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
+                break
+            default:
+                ReactDOM.render(<WordCloud data={data.preferNotToSay.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
+        }
+    }, [data, filter])
 
     return (
-        <div>
+        <>
+            <h1 style={{
+                textAlign: "center",
+                color: "black"
+            }}>Word Cloud</h1>
+            <div style={{
+                display: "flex",
+                justifyContent: "space-evenly",
+            }}>
+                <button className="btn btn-success" onClick={() => setFilter("Male")}>
+                    Male
+                </button>
+                <button className="btn btn-success" onClick={() => setFilter("Female")}>
+                    Female
+                </button>
+                <button className="btn btn-success" onClick={() => setFilter("Others")}>
+                    Others
+                </button>
+                <button className="btn btn-success" onClick={() => setFilter("N/A")}>
+                    Prefer not to say
+                </button>
+            </div>
             <Fragment>
                 <div>
-                    <h2>Male</h2>
-                    <div id="maleSkill"></div>
-                </div>
-                <div>
-                    <h2>Female</h2>
-                    <div id="femaleSkill"></div>
-                </div>
-                <div>
-                    <h2>Others</h2>
-                    <div id="othersSkill"></div>
-                </div>
-                <div>
-                    <h2>PreferNotToSay</h2>
-                    <div id="preferNotToSaySkill"></div>
+                    <h2 style={{ textAlign: "center" }}>{filter}</h2>
+                    <div id="cloud"></div>
                 </div>
             </Fragment>
+            <h1 style={{
+                textAlign: "center",
+                color: "black"
+            }}>Histogram</h1>
             <Fragment>
                 <svg ref={svgRef}></svg>
             </Fragment>
-        </div>
+        </>
     )
 }
 

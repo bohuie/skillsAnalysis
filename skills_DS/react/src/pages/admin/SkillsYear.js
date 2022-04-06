@@ -1,15 +1,17 @@
 import axios from "axios";
 import Cookies from "js-cookie";
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useRef } from "react";
 import ReactDOM from 'react-dom';
-import d3 from 'd3';
+import * as d3 from 'd3';
 import WordCloud from "react-d3-cloud";
 
 const SkillsYear = () => {
 
-    const [data, setData] = useState({});
+    const [data, setData] = useState();
+    const [newData, setNewData] = useState([]);
+    const [filter, setFilter] = useState("First Year");
 
-    // const d3Chart = useRef()
+    const svgRef = useRef();
 
     useEffect(() => {
         axios.get("/api/skills-gender", {
@@ -22,25 +24,33 @@ const SkillsYear = () => {
             const fiveSkills = { skills: [] }
             const fivePlusSkills = { skills: [] }
             let temp
+            let temp2 = []
+            let tempNum
             result.data.profile.map((data, index) => {
                 switch (data.yearOfStudy) {
                     case "One":
                         temp = oneSkills
+                        tempNum = 0
                         break
                     case "Two":
                         temp = twoSkills
+                        tempNum = 1
                         break
                     case "Three":
                         temp = threeSkills
+                        tempNum = 2
                         break
                     case "Four":
                         temp = fourSkills
+                        tempNum = 3
                         break
                     case "Five":
                         temp = fiveSkills
+                        tempNum = 4
                         break
                     default:
                         temp = fivePlusSkills
+                        tempNum = 5
                 }
                 JSON.parse(data.skills).map((skill, index) => {
                     if (temp.skills.length === 0) return temp.skills.push({ text: skill, value: 30 })
@@ -48,6 +58,44 @@ const SkillsYear = () => {
                         if (temp.skills[i].text === skill) return temp.skills[i].value += 30
                         else if (i === temp.skills.length - 1) return temp.skills.push({ text: skill, value: 30 })
                     }
+                });
+
+                // histogram data
+                JSON.parse(data.skills).map((skill, index) => {
+                    if (temp2.length === 0) {
+                        temp2.push({
+                            category: skill,
+                            values: [
+                                { value: 0, group: "first" },
+                                { value: 0, group: "second" },
+                                { value: 0, group: "third" },
+                                { value: 0, group: "fourth" },
+                                { value: 0, group: "fifth" },
+                                { value: 0, group: "fifth+" }
+                            ]
+                        })
+                        temp2[0].values[tempNum].value += 1
+                        return
+                    }
+                    for (let i = 0; i < temp2.length; i++) {
+                        if (temp2[i].category === skill) return temp2[i].values[tempNum].value += 1
+                        else if (i === temp2.length - 1) {
+                            temp2.push({
+                                category: skill,
+                                values: [
+                                    { value: 0, group: "first" },
+                                    { value: 0, group: "second" },
+                                    { value: 0, group: "third" },
+                                    { value: 0, group: "fourth" },
+                                    { value: 0, group: "fifth" },
+                                    { value: 0, group: "fifth+" }
+                                ]
+                            })
+                            temp2[temp2.length - 1].values[tempNum].value += 1
+                            return
+                        }
+                    }
+
                 })
             });
             setData({
@@ -58,70 +106,183 @@ const SkillsYear = () => {
                 five: fiveSkills,
                 fivePlus: fivePlusSkills,
             })
+            setNewData(temp2)
         }).catch((error) => {
             console.log(error)
         })
     }, [])
 
     useEffect(() => {
-        if (Object.keys(data).length === 0) return;
-        ReactDOM.render(<WordCloud data={data.one.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('oneSkill'))
-        ReactDOM.render(<WordCloud data={data.two.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('twoSkill'))
-        ReactDOM.render(<WordCloud data={data.three.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('threeSkill'))
-        ReactDOM.render(<WordCloud data={data.four.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('fourSkill'))
-        ReactDOM.render(<WordCloud data={data.five.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('fiveSkill'))
-        ReactDOM.render(<WordCloud data={data.fivePlus.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('fivePlusSkill'))
-        // ReactDOM.render(<WordCloud data={arrMale} width={150} height={100} rotate={0} padding={0} />, document.getElementById('maleSkill'))
-        // ReactDOM.render(<WordCloud data={arrFemale} width={150} height={100} rotate={0} padding={0} />, document.getElementById('femaleSkill'))
-        // ReactDOM.render(<WordCloud data={arrOthers} width={150} height={100} rotate={0} padding={0} />, document.getElementById('othersSkill'))
-        // ReactDOM.render(<WordCloud data={arrPreferNotToSay} width={150} height={100} rotate={0} padding={0} />, document.getElementById('preferNotToSaySkill'))
-        // console.log(skills)
-        // const margin = {top:50, right:50, bottom:50, left:50}
-        // const chartHeight = parseInt(d3.select('#d3demo').style('height')) - margin.top - margin.bottom
-        // const chartWidth = parseInt(d3.select('#d3demo').style('width')) - margin.left - margin.right
+        if (newData.length === 0) return
 
-        // const svg = d3.select(d3Chart.current)
-        //     .attr('width', chartWidth + margin.left + margin.right)
-        //     .attr('height', chartHeight + margin.top + margin.bottom)
+        const margin = { top: 50, right: 5, bottom: 200, left: 30 }
+        const width = 1200 - margin.left - margin.right
+        const height = 600 - margin.top - margin.bottom
 
-        // const x = d3.scaleBand()
-        //     .domain(d3.range(data.length))
-        //     .range([magin.left, chartWidth - margin.right])
+        const x0 = d3.scaleBand().rangeRound([0, width], .5);
+        const x1 = d3.scaleBand();
+        const y = d3.scaleLinear().rangeRound([height, 0]);
 
-        // svg.append('g')
-        //     .attr('transform', `translate(0, ${chartHeight - margin.bottom})`)
-    }, [data])
+        const xAxis = d3.axisBottom().scale(x0)
+            .tickValues(newData.map(d => d.category))
+
+        const yAxis = d3.axisLeft().scale(y);
+
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        const svg = d3.select(svgRef.current)
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        const categoriesNames = newData.map((d) => d.category);
+        const groupNames = newData[0].values.map((d) => d.group);
+
+        x0.domain(categoriesNames);
+        x1.domain(groupNames).rangeRound([0, x0.bandwidth()]);
+        y.domain([0, d3.max(newData, (category) => { return d3.max(category.values, (d) => { return d.value; }); })]);
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+            .selectAll("text")
+            .attr('y', 0)
+            .attr('x', 9)
+            .attr('dy', '.35em')
+            .attr('transform', 'rotate(90)')
+            .style('text-anchor', 'start');
+
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .style('opacity', '0')
+            .call(yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .style('font-weight', 'bold')
+            .text("Value");
+
+        svg.select('.y').transition().duration(500).delay(1300).style('opacity', '1');
+
+        const slice = svg.selectAll(".slice")
+            .data(newData)
+            .enter().append("g")
+            .attr("class", "g")
+            .attr("transform", (d) => "translate(" + x0(d.category) + ",0)");
+
+        slice.selectAll("rect")
+            .data((d) => d.values)
+            .enter().append("rect")
+            .attr("width", x1.bandwidth())
+            .attr("x", (d) => x1(d.group))
+            .style("fill", (d) => color(d.group))
+            .attr("y", (d) => y(0))
+            .attr("height", (d) => height - y(0))
+
+        slice.selectAll("rect")
+            .transition()
+            .delay((d) => Math.random() * 1000)
+            .duration(1000)
+            .attr("y", (d) => y(d.value))
+            .attr("height", (d) => height - y(d.value));
+
+        //Legend
+        const legend = svg.selectAll(".legend")
+            .data(newData[0].values.map((d) => d.group).reverse())
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", (d, i) => "translate(0," + i * 20 + ")")
+            .style("opacity", "0");
+
+        legend.append("rect")
+            .attr("x", width - 18)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", (d) => color(d));
+
+        legend.append("text")
+            .attr("x", width - 24)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text((d) => d);
+
+        legend.transition().duration(500).delay((d, i) => 1300 + 100 * i).style("opacity", "1");
+
+    }, [newData])
+
+    useEffect(() => {
+        if (!filter) return
+        if (!data) return
+        switch (filter) {
+            case 'First Year':
+                ReactDOM.render(<WordCloud data={data.one.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
+                break
+            case 'Second Year':
+                ReactDOM.render(<WordCloud data={data.two.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
+                break
+            case 'Third Year':
+                ReactDOM.render(<WordCloud data={data.three.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
+                break
+            case 'Fourth Year':
+                ReactDOM.render(<WordCloud data={data.four.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
+                break
+            case 'Fifth Year':
+                ReactDOM.render(<WordCloud data={data.five.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
+                break
+            default:
+                ReactDOM.render(<WordCloud data={data.fivePlus.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
+        }
+    }, [data, filter])
 
     return (
-        <div>
-            {/* <svg ref={d3Chart}></svg> */}
+        <>
+            <h1 style={{
+                textAlign: "center",
+                color: "black"
+            }}>Word Cloud</h1>
+            <div style={{
+                display: "flex",
+                justifyContent: "space-evenly",
+            }}>
+                <button className="btn btn-success" onClick={() => setFilter("First Year")}>
+                    1st Year
+                </button>
+                <button className="btn btn-success" onClick={() => setFilter("Second Year")}>
+                    2nd Year
+                </button>
+                <button className="btn btn-success" onClick={() => setFilter("Third Year")}>
+                    3rd Year
+                </button>
+                <button className="btn btn-success" onClick={() => setFilter("Fourth Year")}>
+                    4th Year
+                </button>
+                <button className="btn btn-success" onClick={() => setFilter("Fifth Year")}>
+                    5th Year
+                </button>
+                <button className="btn btn-success" onClick={() => setFilter("Fifth+ Year")}>
+                    5+ Year
+                </button>
+            </div>
             <Fragment>
                 <div>
-                    <h2>1st Year</h2>
-                    <div id="oneSkill"></div>
-                </div>
-                <div>
-                    <h2>2nd Year</h2>
-                    <div id="twoSkill"></div>
-                </div>
-                <div>
-                    <h2>3rd Year</h2>
-                    <div id="threeSkill"></div>
-                </div>
-                <div>
-                    <h2>4th Year</h2>
-                    <div id="fourSkill"></div>
-                </div>
-                <div>
-                    <h2>5th Year</h2>
-                    <div id="fiveSkill"></div>
-                </div>
-                <div>
-                    <h2>5+ Year</h2>
-                    <div id="fivePlusSkill"></div>
+                    <h2 style={{ textAlign: "center" }}>{filter}</h2>
+                    <div id="cloud"></div>
                 </div>
             </Fragment>
-        </div>
+            <h1 style={{
+                textAlign: "center",
+                color: "black"
+            }}>Histogram</h1>
+            <Fragment>
+                <svg ref={svgRef}></svg>
+            </Fragment>
+        </>
     )
 }
 
