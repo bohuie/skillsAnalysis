@@ -12,6 +12,8 @@ def login_required_view(request):
 	else:
 		return redirect("login")
 
+def word_cloud(request):
+	return render(request,'react/index.html')
 def profile_required_view(request):
 	if request.user.is_authenticated:
 		if Profile.objects.filter(user = request.user).exists():

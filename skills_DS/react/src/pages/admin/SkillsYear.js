@@ -21,7 +21,6 @@ const SkillsYear = () => {
             const twoSkills = { skills: [] }
             const threeSkills = { skills: [] }
             const fourSkills = { skills: [] }
-            const fiveSkills = { skills: [] }
             const fivePlusSkills = { skills: [] }
             let temp
             let temp2 = []
@@ -44,13 +43,9 @@ const SkillsYear = () => {
                         temp = fourSkills
                         tempNum = 3
                         break
-                    case "Five":
-                        temp = fiveSkills
-                        tempNum = 4
-                        break
                     default:
                         temp = fivePlusSkills
-                        tempNum = 5
+                        tempNum = 4
                 }
                 JSON.parse(data.skills).map((skill, index) => {
                     if (temp.skills.length === 0) return temp.skills.push({ text: skill, value: 30 })
@@ -70,7 +65,6 @@ const SkillsYear = () => {
                                 { value: 0, group: "second" },
                                 { value: 0, group: "third" },
                                 { value: 0, group: "fourth" },
-                                { value: 0, group: "fifth" },
                                 { value: 0, group: "fifth+" }
                             ]
                         })
@@ -87,7 +81,6 @@ const SkillsYear = () => {
                                     { value: 0, group: "second" },
                                     { value: 0, group: "third" },
                                     { value: 0, group: "fourth" },
-                                    { value: 0, group: "fifth" },
                                     { value: 0, group: "fifth+" }
                                 ]
                             })
@@ -103,7 +96,6 @@ const SkillsYear = () => {
                 two: twoSkills,
                 three: threeSkills,
                 four: fourSkills,
-                five: fiveSkills,
                 fivePlus: fivePlusSkills,
             })
             setNewData(temp2)
@@ -232,9 +224,6 @@ const SkillsYear = () => {
             case 'Fourth Year':
                 ReactDOM.render(<WordCloud data={data.four.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
                 break
-            case 'Fifth Year':
-                ReactDOM.render(<WordCloud data={data.five.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
-                break
             default:
                 ReactDOM.render(<WordCloud data={data.fivePlus.skills} width={150} height={100} rotate={0} padding={0} />, document.getElementById('cloud'))
         }
@@ -261,9 +250,6 @@ const SkillsYear = () => {
                 </button>
                 <button className="btn btn-success" onClick={() => setFilter("Fourth Year")}>
                     4th Year
-                </button>
-                <button className="btn btn-success" onClick={() => setFilter("Fifth Year")}>
-                    5th Year
                 </button>
                 <button className="btn btn-success" onClick={() => setFilter("Fifth+ Year")}>
                     5+ Year

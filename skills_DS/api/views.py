@@ -12,6 +12,61 @@ import json
 import threading
 import contextlib
 import os
+from rest_framework.permissions import IsAdminUser
+from .skills_extraction import extract_skills
+from .serializers import SkillSerializer
+from .models import JobPosting, JobTitle, Skill, InvalidSkill
+
+# Create your views here.
+class AnswersView(APIView):
+	def post(self, request):
+		try:
+			if request.data and 'age' in request.data and 'gender' in request.data and 'yearOfStudy' in request.data:		
+				if Profile.objects.filter(user = request.user).exists():
+					Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
+				else:
+					Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy =  request.data['yearOfStudy'])
+				return Response({
+						"message" : "Successfully updated user profile"
+					}, status=status.HTTP_200_OK)
+			else:
+				logging.debug(request.data)
+				return Response({
+						"message" : "Bad Request"
+					}, status=status.HTTP_400_BAD_REQUEST)
+		except Exception as e:
+			logging.debug(str(e))
+			return Response({
+						"message" : "Internal Server Error"
+					}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class GetJobsView(APIView):
+	permission_classes = [IsAdminUser]
+
+	def post(self, request):
+		position = request.data['position']
+		location = request.data['location']
+		country = request.data['country']
+		remote = request.data['remote']
+		num = int(request.data['number'])
+		radius = int(request.data['radius'])
+		get_jobs(position, location, num, country, remote, radius)
+		return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
+
+class GetSkillsView(APIView):
+	permission_classes = [IsAdminUser]
+
+	def post(self, request):
+		position = request.data['position']
+		location = request.data['location']
+		distance = int(request.data['distance'])
+		try:
+			extract_skills(position, location, distance)
+			return Response({"success": "success"}, status=status.HTTP_200_OK)
+		except Exception as ex:
+			print(ex)
+			return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
+
  
 # User views
 class GetUserProfileView(APIView):
@@ -105,26 +160,36 @@ class ResumeUploadView(APIView):
 
 		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
 		Profile.objects.filter(user = request.user).update(resume_processing = False)
-		return
+		
+class CheckUserView(APIView):
+	def get(self, request, format=None):
+		if request.user.is_authenticated:
+			return Response({'hey': 'it worked'}, status=status.HTTP_200_OK)
+		else:
+			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
 
-class AnswersView(APIView):
+class GetJobTitleView(APIView):
+	def get(self,request,format=None):
+		if request.user.is_authenticated:
+			jobTitle = JobTitle.objects.all().values()
+			return Response({'title': jobTitle}, status=status.HTTP_200_OK)
+		else:
+			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class GetJobSkillView(APIView):
 	def post(self, request):
-		try:
-			if request.data and 'age' in request.data and 'gender' in request.data and 'yearOfStudy' in request.data:		
-				if Profile.objects.filter(user = request.user).exists():
-					Profile.objects.filter(user = request.user).update(age = request.data['age'], gender = request.data['gender'], yearOfStudy = request.data['yearOfStudy'])
-				else:
-					Profile.objects.create(user = request.user, age = request.data['age'], gender = request.data['gender'], yearOfStudy =  request.data['yearOfStudy'])
-				return Response({
-						"message" : "Successfully updated user profile"
-					}, status=status.HTTP_200_OK)
-			else:
-				logging.debug(request.data)
-				return Response({
-						"message" : "Bad Request"
-					}, status=status.HTTP_400_BAD_REQUEST)
-		except Exception as e:
-			logging.debug(str(e))
-			return Response({
-						"message" : "Internal Server Error"
-					}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+		if request.data:		
+			jobTitle = request.data['job']
+			jobSkill = Skill.objects.filter(job_title__name =jobTitle, verified = True).values('name','count').order_by('-count')[:100]
+			return Response({'skills': jobSkill},status=status.HTTP_200_OK)	
+		else:
+			print(request.data)
+			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+
+class GetAllProfileView(APIView):
+	def get(self, request, format=None):
+		if request.user.is_authenticated:
+			profile = Profile.objects.all().values('skills')
+			return Response({'success': profile}, status=status.HTTP_200_OK)
+		else:
+			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
