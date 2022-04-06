@@ -18,11 +18,13 @@ const SkillsYear = () => {
         axios.get("/api/skills-gender", {
             headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") }
         }).then((result) => {
+            console.log(result)
             const oneSkills = { skills: [] }
             const twoSkills = { skills: [] }
             const threeSkills = { skills: [] }
             const fourSkills = { skills: [] }
             const fivePlusSkills = { skills: [] }
+            const WORD_CLOUD_INCREMENT = 5
             let temp
             let temp2 = []
             let tempNum
@@ -49,10 +51,10 @@ const SkillsYear = () => {
                         tempNum = 4
                 }
                 JSON.parse(data.skills).map((skill, index) => {
-                    if (temp.skills.length === 0) return temp.skills.push({ text: skill, value: 30 })
+                    if (temp.skills.length === 0) return temp.skills.push({ text: skill, value: WORD_CLOUD_INCREMENT })
                     for (let i = 0; i < temp.skills.length; i++) {
-                        if (temp.skills[i].text === skill) return temp.skills[i].value += 30
-                        else if (i === temp.skills.length - 1) return temp.skills.push({ text: skill, value: 30 })
+                        if (temp.skills[i].text === skill) return temp.skills[i].value += WORD_CLOUD_INCREMENT
+                        else if (i === temp.skills.length - 1) return temp.skills.push({ text: skill, value: WORD_CLOUD_INCREMENT })
                     }
                 });
 

@@ -22,6 +22,7 @@ const SkillsGender = () => {
             const femaleSkills = { skills: [] }
             const othersSkills = { skills: [] }
             const preferNotToSaySkills = { skills: [] }
+            const WORD_CLOUD_INCREMENT = 5
             let temp
             let temp2 = []
             let tempNum
@@ -44,10 +45,10 @@ const SkillsGender = () => {
                         tempNum = 3
                 }
                 JSON.parse(data.skills).map((skill, index) => {
-                    if (temp.skills.length === 0) return temp.skills.push({ text: skill, value: 30 })
+                    if (temp.skills.length === 0) return temp.skills.push({ text: skill, value: WORD_CLOUD_INCREMENT })
                     for (let i = 0; i < temp.skills.length; i++) {
-                        if (temp.skills[i].text === skill) return temp.skills[i].value += 30
-                        else if (i === temp.skills.length - 1) return temp.skills.push({ text: skill, value: 30 })
+                        if (temp.skills[i].text === skill) return temp.skills[i].value += WORD_CLOUD_INCREMENT
+                        else if (i === temp.skills.length - 1) return temp.skills.push({ text: skill, value: WORD_CLOUD_INCREMENT })
                     }
                 })
 
