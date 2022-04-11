@@ -11,7 +11,8 @@ urlpatterns = [
     path('update-skills', views_admin.UpdateSkillsView.as_view()),
     path('resume-upload', views.ResumeUploadView.as_view()),
     path('get-profile', views.GetUserProfileView.as_view()),
-    path('update-user-skills', views.UpdateUserSkillsView.as_view())
+    path('update-user-skills', views.UpdateUserSkillsView.as_view()),
+    path('match-jobs', views.MatchJobsView.as_view())
 ]
 
 if settings.DEBUG:

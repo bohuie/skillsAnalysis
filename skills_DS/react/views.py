@@ -17,6 +17,6 @@ def profile_required_view(request):
 		if Profile.objects.filter(user = request.user).exists():
 			return render(request, 'react/index.html')
 		else:
-			return redirect("questions")
+			return redirect("/questions")
 	else:
 		return redirect("login")
