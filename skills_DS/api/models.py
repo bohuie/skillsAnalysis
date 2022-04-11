@@ -28,6 +28,7 @@ class JobPosting(models.Model):
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
     job_title = models.ForeignKey(JobTitle, on_delete=models.SET_NULL, null=True)
     scraped = models.BooleanField(default=False)
+    url = models.CharField(max_length=100)
 
     def __str__(self):
         return self.title

@@ -16,6 +16,12 @@ from rest_framework.permissions import IsAdminUser
 from .skills_extraction import extract_skills
 from .serializers import SkillSerializer
 from .models import JobPosting, JobTitle, Skill, InvalidSkill
+from api.models import JobPosting, JobTitle
+from .serializers import JobPostingSerializer
+import re
+import math
+from collections import Counter
+from api.views_admin import ScrapeJobsView
 
 # Create your views here.
 class AnswersView(APIView):
@@ -66,7 +72,6 @@ class GetSkillsView(APIView):
 		except Exception as ex:
 			print(ex)
 			return Response({"error": str(ex)}, status=status.HTTP_400_BAD_REQUEST)
-
  
 # User views
 class GetUserProfileView(APIView):
@@ -75,7 +80,7 @@ class GetUserProfileView(APIView):
 			if Profile.objects.filter(user = request.user).exists():
 				profile = Profile.objects.filter(user = request.user).values()[0]
 				profile["gender"] = Profile.Gender[profile["gender"]].value
-				profile["yearOfStudy"] = Profile.Year[profile["yearOfStudy"]].value
+				profile["yearOfStudy"] = 1 
 				profile["full_name"] = request.user.get_full_name()
 				profile["email"] = request.user.email
 				return Response({
@@ -193,4 +198,77 @@ class GetAllProfileView(APIView):
 			return Response({'success': profile}, status=status.HTTP_200_OK)
 		else:
 			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+class MatchJobsView(APIView):
+
+	prog = re.compile(r"\w+")
+
+	def post(self, request):
+		if not request.user.is_authenticated:
+			return Response({
+				"message": "User not logged in."
+			}, status=status.HTTP_401_UNAUTHORIZED)
+		if Profile.objects.filter(user = request.user).exists():
+			position = request.data['position']
+			titles = JobTitle.objects.filter(name=position.lower())
+			if len(titles) == 0:
+				return Response({
+						"message": "There are no jobs in the database for the provided position."
+					}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+			title = titles[0]
+			location = request.data['location']
+			remote = request.data['remote']
+			distance = int(request.data['distance'])
+			user_skills = json.loads(request.user.profile.skills)
+			if len(user_skills) == 0:
+				return Response({
+					"message": "You need to add some skills to your profile before you can get matching jobs."
+				}, status=status.HTTP_400_BAD_REQUEST)
+			user_vector = Counter(self.prog.findall(" ".join(user_skills)))
+			(x1, x2, y1, y2) = self.get_coordinates(location, distance)
+			jobs = JobPosting.objects.filter(location__lat__gte=x1, location__lat__lte=x2, location__lng__gte=y1, location__lng__lte=y2, job_title=title)
+			if len(jobs) == 0:
+				t = threading.Thread(target=ScrapeJobsView.scrape_jobs,args=[position, location, 10, location['country'], remote, distance])
+				t.start()
+				return Response({
+					"message": "Could not find any jobs in the database."
+				}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+			if remote == "only":
+				jobs = jobs.filter(remote=True)
+			elif remote == "none":
+				jobs = jobs.filter(remote=False)
+			matching_jobs = []
+			for job in jobs:
+				job_vector = Counter(self.prog.findall(job.description))
+				score = self.get_cosine(user_vector, job_vector)
+				if score > 0:
+					matching_jobs.append({"job": JobPostingSerializer(job).data, "score": score})
+			return Response({
+				"message": "Successfully matched jobs",
+				"jobs": matching_jobs[:25]
+			}, status=status.HTTP_200_OK)
+		else:
+			return Response({
+				"message": "User does not have a profile"
+			}, status=status.HTTP_400_BAD_REQUEST) 
+
+	def get_cosine(self, vec1, vec2):
+		intersection = set(vec1.keys()) & set(vec2.keys())
+		numerator = sum([vec1[x] * vec2[x] for x in intersection])
+
+		sum1 = sum([vec1[x] ** 2 for x in list(vec1.keys())])
+		sum2 = sum([vec2[x] ** 2 for x in list(vec2.keys())])
+		denominator = math.sqrt(sum1) * math.sqrt(sum2)
+
+		if not denominator:
+			return 0.0
+		else:
+			return float(numerator) / denominator
 	
+	def get_coordinates(self, location, distance):
+		dist = ((math.sqrt(2)/2) * distance)
+		lat = dist/110.574
+		lng = dist/(111.320*math.cos(math.radians(lat)))
+
+		return (location['lat'] - lat,location['lat'] + lat,location['lng'] - lng,location['lng'] + lng)

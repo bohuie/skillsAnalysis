@@ -89,11 +89,11 @@ class ScrapeJobsView(APIView):
                     'Content-Type': 'text/html',
                 }
                 reqs = [session.get(url, headers=headers) for url in urls]
-                for req in reqs:
+                for index, req in enumerate(reqs):
                     resp = req.result()
                     record = self.get_record(resp.content)
                     if record is not None:
-                        records.append(record)
+                        records.append(record + [urls[index]])
                         
                 try:
                     url = 'https://ca.indeed.com' + soup.find('a', {'aria-label': 'Next'}).get('href')
@@ -107,7 +107,7 @@ class ScrapeJobsView(APIView):
             title, created = JobTitle.objects.get_or_create(name=position.lower())
 
             for record in records:
-                obj, created = JobPosting.objects.get_or_create(title=record[0], company=record[1], is_remote=record[2], description=record[3], location=loc, job_title=title)
+                obj, created = JobPosting.objects.get_or_create(title=record[0], company=record[1], is_remote=record[2], description=record[3], location=loc, job_title=title, url=record[4])
 
             ScrapeJobsView.progress["processing"] = False
         except Exception as e:
