@@ -196,6 +196,25 @@ class GetJobSkillView(APIView):
 		else:
 			print(request.data)
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+
+class GetSkillsInformation(APIView):
+	def post(self, request):
+		if request.data:
+			skills = request.data['skills']
+			skills_info = []
+			for skill in skills:
+				skill_info = Skill.objects.filter(name=skill, verified = True).values('name','job_title__name', 'count')
+				if len(skill_info) > 0:
+					skills_info += skill_info
+			return Response({
+					"message" : "Retrived skills information",
+					"skills_info": skills_info	
+				}, status=status.HTTP_200_OK)
+		else:
+			print(request.data)
+			return Response({
+					"message": "Missing data."
+				}, status=status.HTTP_400_BAD_REQUEST)
 	
 	def get(self, request):
 		top_skills_per_job = Skill.objects.filter(
@@ -205,7 +224,10 @@ class GetJobSkillView(APIView):
 		top_skills = Skill.objects.filter(
 				id__in=Subquery(top_skills_per_job.values('id'))
 			).values('name','count', 'job_title__name') 
-		return Response({'skills': top_skills},status=status.HTTP_200_OK)	
+		return Response({
+					"message" : "Retrived skills information",
+					"skills_info": top_skills	
+				}, status=status.HTTP_200_OK)
 
 
 class GetAllProfileView(APIView):
