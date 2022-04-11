@@ -53,7 +53,7 @@ class ScrapeJobsView(APIView):
     def scrape_jobs(self, position, location, num, country, remote, radius):
         try:
             records = []
-            url = self.get_url(position, location['name'], country, radius)
+            url = self.get_url(self=self,position=position, location=location['name'], country=country, radius=radius)
             i = 0
             while num > i:
                 ScrapeJobsView.progress["num_scraped"] = i
@@ -91,9 +91,9 @@ class ScrapeJobsView(APIView):
                 reqs = [session.get(url, headers=headers) for url in urls]
                 for index, req in enumerate(reqs):
                     resp = req.result()
-                    record = self.get_record(resp.content)
+                    record = self.get_record(self=self, page=resp.content)
                     if record is not None:
-                        records.append(record + [urls[index]])
+                        records.append(record + (urls[index],))
                         
                 try:
                     url = 'https://ca.indeed.com' + soup.find('a', {'aria-label': 'Next'}).get('href')
@@ -107,7 +107,13 @@ class ScrapeJobsView(APIView):
             title, created = JobTitle.objects.get_or_create(name=position.lower())
 
             for record in records:
-                obj, created = JobPosting.objects.get_or_create(title=record[0], company=record[1], is_remote=record[2], description=record[3], location=loc, job_title=title, url=record[4])
+                obj, created = JobPosting.objects.get_or_create(title=record[0], company=record[1], is_remote=record[2], )
+                if created:
+                    obj.description=record[3] 
+                    obj.location=loc 
+                    obj.job_title=title
+                    obj.url=record[4]
+                    obj.save()
 
             ScrapeJobsView.progress["processing"] = False
         except Exception as e:
@@ -133,6 +139,10 @@ class ScrapeJobsView(APIView):
             company=""
         else:
             company = card.find('div', 'jobsearch-InlineCompanyRating').text.strip()
+            if company.split(" ")[-1] == "reviews":
+                company = " ".join(company.split(" ")[:-1])
+                while company[-1].isnumeric():
+                    company = company[:-1]
 
         if type(card.find('div', 'jobsearch-JobInfoHeader-title-container'))==type(None):
             job_title=""

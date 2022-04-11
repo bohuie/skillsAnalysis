@@ -3,12 +3,14 @@ import {useState, useEffect, Fragment} from "react"
 import Cookies from "js-cookie"
 import professions from "professions"
 import {googleMapsKey} from "../secrets.json"
+import Alert from "../components/Alert"
 
 const MatchJobs = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [jobs, setJobs] = useState(null)
   const [scene, setScene] = useState(0)
+  const [skipped, setSkipped] = useState(0)
 
   const matchJobs = event => {
     event.preventDefault()
@@ -33,15 +35,20 @@ const MatchJobs = () => {
         )
       })
       .then(({data}) => {
-        setJobs(data.jobs.sort((a, b) => b.score - a.score))
-        setScene(1)
         setLoading(false)
+        if (data.jobs.length === 0) {
+          return setError("Your skills do not match any jobs with the given conditions.")
+        }
+        setJobs(data.jobs.sort((a, b) => b.score - a.score))
+        setSkipped(data.skipped)
+        setScene(1)
       })
       .catch(err => {
+        setLoading(false)
         if (err.response.status === 503) {
           setError("We can't find any jobs with the specified conditions, please check back in a minute.")
         } else {
-          setError(err.response.data.message || err.toString())
+          setError(err.response.data.message)
         }
       })
   }
@@ -49,7 +56,7 @@ const MatchJobs = () => {
   const goBack = () => {
     setScene(0)
     setLoading(false)
-    setError(null)
+    setError(false)
   }
 
   return (
@@ -57,7 +64,7 @@ const MatchJobs = () => {
       {loading ? (
         <h2>Loading...</h2>
       ) : error ? (
-        <h2>{error}</h2>
+        <Alert message={error} visible type="danger" handleDismiss={goBack} />
       ) : scene == 0 ? (
         <form onSubmit={matchJobs}>
           <div className="form-group">
@@ -125,6 +132,8 @@ const MatchJobs = () => {
               </div>
             )
           })}
+          <br />
+          {jobs.length < 10 && <h2 style={{textAlign: "center"}}>{skipped} jobs didn't match your skills.</h2>}
         </Fragment>
       )}
     </Fragment>

@@ -203,6 +203,7 @@ class GetAllProfileView(APIView):
 class MatchJobsView(APIView):
 
 	prog = re.compile(r"\w+")
+	JOBS_TO_SCRAPE = 100
 
 	def post(self, request):
 		if not request.user.is_authenticated:
@@ -211,12 +212,6 @@ class MatchJobsView(APIView):
 			}, status=status.HTTP_401_UNAUTHORIZED)
 		if Profile.objects.filter(user = request.user).exists():
 			position = request.data['position']
-			titles = JobTitle.objects.filter(name=position.lower())
-			if len(titles) == 0:
-				return Response({
-						"message": "There are no jobs in the database for the provided position."
-					}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-			title = titles[0]
 			location = request.data['location']
 			remote = request.data['remote']
 			distance = int(request.data['distance'])
@@ -227,26 +222,40 @@ class MatchJobsView(APIView):
 				}, status=status.HTTP_400_BAD_REQUEST)
 			user_vector = Counter(self.prog.findall(" ".join(user_skills)))
 			(x1, x2, y1, y2) = self.get_coordinates(location, distance)
-			jobs = JobPosting.objects.filter(location__lat__gte=x1, location__lat__lte=x2, location__lng__gte=y1, location__lng__lte=y2, job_title=title)
-			if len(jobs) == 0:
-				t = threading.Thread(target=ScrapeJobsView.scrape_jobs,args=[position, location, 10, location['country'], remote, distance])
+			titles = JobTitle.objects.filter(name=position.lower())
+			if len(titles) < 10:
+				t = threading.Thread(target=ScrapeJobsView.scrape_jobs,args=[ScrapeJobsView,position, location, self.JOBS_TO_SCRAPE, location['country'], remote, distance])
 				t.start()
-				return Response({
-					"message": "Could not find any jobs in the database."
-				}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+				if len(titles) == 0:
+					return Response({
+						"message": "Could not find any jobs in the database."
+					}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+			title = titles[0]
+			jobs = JobPosting.objects.filter(location__lat__gte=x1, location__lat__lte=x2, location__lng__gte=y1, location__lng__lte=y2, job_title=title)
+			if len(jobs) < 10:
+				t = threading.Thread(target=ScrapeJobsView.scrape_jobs,args=[ScrapeJobsView, position, location, self.JOBS_TO_SCRAPE, location['country'], remote, distance])
+				t.start()
+				if len(jobs) == 0:
+					return Response({
+						"message": "Could not find any jobs in the database."
+					}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 			if remote == "only":
 				jobs = jobs.filter(remote=True)
 			elif remote == "none":
 				jobs = jobs.filter(remote=False)
 			matching_jobs = []
+			skipped_jobs = 0
 			for job in jobs:
 				job_vector = Counter(self.prog.findall(job.description))
 				score = self.get_cosine(user_vector, job_vector)
 				if score > 0:
 					matching_jobs.append({"job": JobPostingSerializer(job).data, "score": score})
+				else:
+					skipped_jobs+=1
 			return Response({
 				"message": "Successfully matched jobs",
-				"jobs": matching_jobs[:25]
+				"jobs": matching_jobs[:25],
+				"skipped": skipped_jobs,
 			}, status=status.HTTP_200_OK)
 		else:
 			return Response({
