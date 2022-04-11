@@ -5,3 +5,4 @@ __pycache__/
 secrets.json
 docker/postgresql/data
 skills_DS/media
+.bash_profile.save
