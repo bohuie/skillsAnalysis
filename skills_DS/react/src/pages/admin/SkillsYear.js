@@ -49,7 +49,7 @@ const SkillsYear = () => {
                         temp = fivePlusSkills
                         tempNum = 4
                 }
-                JSON.parse(data.skills).map((skill, index) => {
+                Object.values(JSON.parse(data.skills)).pop().map((skill, index) => {
                     if (temp.skills.length === 0) return temp.skills.push({ text: skill, value: WORD_CLOUD_INCREMENT })
                     for (let i = 0; i < temp.skills.length; i++) {
                         if (temp.skills[i].text === skill) return temp.skills[i].value += WORD_CLOUD_INCREMENT
@@ -58,10 +58,11 @@ const SkillsYear = () => {
                 });
 
                 // histogram data
-                JSON.parse(data.skills).map((skill, index) => {
+                Object.values(JSON.parse(data.skills)).pop().map((skill, index) => {
                     if (temp2.length === 0) {
                         temp2.push({
                             category: skill,
+                            total: 1,
                             values: [
                                 { value: 0, group: "first" },
                                 { value: 0, group: "second" },
@@ -74,10 +75,14 @@ const SkillsYear = () => {
                         return
                     }
                     for (let i = 0; i < temp2.length; i++) {
-                        if (temp2[i].category === skill) return temp2[i].values[tempNum].value += 1
-                        else if (i === temp2.length - 1) {
+                        if (temp2[i].category === skill) {
+                            temp2[i].values[tempNum].value += 1
+                            temp2[i].total += 1
+                            return
+                        } else if (i === temp2.length - 1) {
                             temp2.push({
                                 category: skill,
+                                total: 1,
                                 values: [
                                     { value: 0, group: "first" },
                                     { value: 0, group: "second" },
@@ -108,14 +113,13 @@ const SkillsYear = () => {
 
     useEffect(() => {
         if (newData.length === 0) return
-
         let filteredData = newData
         if (filter2) {
             const topNum = parseInt(filter2)
-            const temp = filteredData.filter((d) => d.values.some((e) => e.value >= topNum))
+            // const temp = filteredData.filter((d) => d.values.some((e) => e.value >= topNum))
+            const temp = filteredData.sort((a, b) => b.total - a.total).slice(0, topNum)
             filteredData = temp.length === 0 ? newData : temp
         }
-
         const margin = { top: 50, right: 5, bottom: 200, left: 30 }
         const width = 1200 - margin.left - margin.right
         const height = 600 - margin.top - margin.bottom
@@ -274,7 +278,7 @@ const SkillsYear = () => {
                 textAlign: "center",
                 color: "black"
             }}>Histogram</h1>
-            <input className="form-control" type="number" placeholder="Above Filter" onChange={(e) => { setFilter2(e.target.value)}}></input>
+            <input className="form-control" type="number" placeholder="Top Filter" onChange={(e) => { setFilter2(e.target.value)}}></input>
             <Fragment>
                 <svg ref={svgRef} key={filter2}></svg>
             </Fragment>
