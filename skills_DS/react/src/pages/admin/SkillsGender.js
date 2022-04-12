@@ -99,14 +99,14 @@ const SkillsGender = () => {
             })
             setNewData(temp2)
         }).catch((error) => {
-            console.log(error)
+            console.error(error)
         })
     }, [])
 
     useEffect(() => {
         if (newData.length === 0) return
         let filteredData = newData
-        if (filter2) {
+        if (filter2 && filter2 > 0) {
             const topNum = parseInt(filter2)
             // const temp = filteredData.filter((d) => d.values.some((e) => e.value >= topNum))
             const temp = filteredData.sort((a, b) => b.total - a.total).slice(0, topNum)

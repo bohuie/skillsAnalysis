@@ -64,11 +64,11 @@ const SkillsYear = () => {
                             category: skill,
                             total: 1,
                             values: [
-                                { value: 0, group: "first" },
-                                { value: 0, group: "second" },
-                                { value: 0, group: "third" },
+                                { value: 0, group: "fifth+" },
                                 { value: 0, group: "fourth" },
-                                { value: 0, group: "fifth+" }
+                                { value: 0, group: "third" },
+                                { value: 0, group: "second" },
+                                { value: 0, group: "first" }
                             ]
                         })
                         temp2[0].values[tempNum].value += 1
@@ -84,11 +84,11 @@ const SkillsYear = () => {
                                 category: skill,
                                 total: 1,
                                 values: [
-                                    { value: 0, group: "first" },
-                                    { value: 0, group: "second" },
-                                    { value: 0, group: "third" },
+                                    { value: 0, group: "fifth+" },
                                     { value: 0, group: "fourth" },
-                                    { value: 0, group: "fifth+" }
+                                    { value: 0, group: "third" },
+                                    { value: 0, group: "second" },
+                                    { value: 0, group: "first" }
                                 ]
                             })
                             temp2[temp2.length - 1].values[tempNum].value += 1
@@ -114,7 +114,7 @@ const SkillsYear = () => {
     useEffect(() => {
         if (newData.length === 0) return
         let filteredData = newData
-        if (filter2) {
+        if (filter2 && filter2 > 0) {
             const topNum = parseInt(filter2)
             // const temp = filteredData.filter((d) => d.values.some((e) => e.value >= topNum))
             const temp = filteredData.sort((a, b) => b.total - a.total).slice(0, topNum)
