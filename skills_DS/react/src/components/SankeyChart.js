@@ -38,7 +38,7 @@ const SankeyChart = ({
     marginLeft = 1, // left margin, in pixels
 } = {}) => {
     const svgRef = React.useRef(null);
-
+    
     React.useEffect(() => {
         const svgEl = d3.select(svgRef.current);
         svgEl.selectAll("*").remove(); // Clear svg content before adding new elements 
