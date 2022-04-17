@@ -63,7 +63,6 @@ class Profile(models.Model):
         Two = "2"
         Three = "3"
         Four = "4"
-        Five = "5"
         Fivep = "5+"
 
     user = models.OneToOneField(User,on_delete=models.CASCADE, related_name="profile")

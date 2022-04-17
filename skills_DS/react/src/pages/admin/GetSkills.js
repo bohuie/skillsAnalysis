@@ -198,7 +198,7 @@ const GetSkills = props => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="location" data-testid="location-label">Location:</label>
+            <label htmlFor="location" data-testid="location-label">Location(City,Province/State):</label>
             <input id="location" type="text" autoComplete="off" name="location" className="form-control" />
           </div>
           <div className="form-group">
