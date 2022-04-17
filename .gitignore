@@ -6,3 +6,4 @@ secrets.json
 docker/postgresql/data
 skills_DS/media
 .env
+.bash_profile.save

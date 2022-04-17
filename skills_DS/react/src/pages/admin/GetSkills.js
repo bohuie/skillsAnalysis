@@ -184,10 +184,10 @@ const GetSkills = props => {
       />
 
       <div className="shadow p-3 mb-5 bg-white rounded">
-        <h1>Scrape Jobs</h1>
+        <h1 data-testid="scrape-header">Scrape Jobs</h1>
         <form onSubmit={scrapeJobs}>
           <div className="form-group">
-            <label htmlFor="position">Position:</label>
+            <label htmlFor="position" data-testid="position-label">Position:</label>
             <input list="brow" id="position" className="form-control form-control" />
             <datalist id="brow">
               {professions.map((profession, index) => (
@@ -197,11 +197,11 @@ const GetSkills = props => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="location">Location:</label>
+            <label htmlFor="location" data-testid="location-label">Location(City,Province/State):</label>
             <input id="location" type="text" autoComplete="off" name="location" className="form-control" />
           </div>
           <div className="form-group">
-            <label htmlFor="remote">Remote:</label>
+            <label htmlFor="remote" data-testid="remote-label">Remote:</label>
             <select id="remote" className="form-control form-control" name="remote" defaultValue="allowed">
               <option value="none">None</option>
               <option value="allowed">Allowed</option>
@@ -209,24 +209,24 @@ const GetSkills = props => {
             </select>
           </div>
           <div className="form-group">
-            <label htmlFor="number">Number of jobs to fetch:</label>
+            <label htmlFor="number" data-testid="jobs-label">Number of jobs to fetch:</label>
             <input type="number" id="number" autoComplete="off" className="form-control" name="number" />
           </div>
           <div className="form-group">
-            <label htmlFor="radius">Radius (km):</label>
+            <label htmlFor="radius" data-testid="radius-label">Radius (km):</label>
             <input type="number" id="radius" className="form-control" name="radius" />
           </div>
-          <button className="btn btn-primary" type="submit">
+          <button className="btn btn-primary" data-testid="jobs-button" type="submit">
             Get jobs
           </button>
         </form>
       </div>
 
       <div className="shadow p-3 mb-5 bg-white rounded">
-        <h1>Extract Skills</h1>
+        <h1 data-testid="extract-header">Extract Skills</h1>
         <form onSubmit={extractSkills}>
           <div className="form-group">
-            <label htmlFor="extractPosition">Position:</label>
+            <label htmlFor="extractPosition" data-testid="position-extract-label">Position:</label>
             <input list="brow" id="extractPosition" className="form-control form-control" />
             <datalist id="brow">
               {professions.map((profession, index) => (
@@ -235,14 +235,14 @@ const GetSkills = props => {
             </datalist>
           </div>
           <div className="form-group">
-            <label htmlFor="extractLocation">Location:</label>
+            <label htmlFor="extractLocation" data-testid="location-extract-label">Location:</label>
             <input id="extractLocation" type="text" autoComplete="off" className="form-control form-control" />
           </div>
           <div className="form-group">
-            <label htmlFor="distance">Max distance away (km):</label>
+            <label htmlFor="distance" data-testid="distance-extract-label">Max distance away (km):</label>
             <input id="distance" type="number" className="form-control form-control" />
           </div>
-          <button className="btn btn-primary" type="submit">
+          <button className="btn btn-primary" data-testid="skills-button" type="submit">
             Get Skills
           </button>
         </form>
