@@ -112,7 +112,7 @@ const SkillsGender = () => {
             const temp = filteredData.sort((a, b) => b.total - a.total).slice(0, topNum)
             filteredData = temp.length === 0 ? newData : temp
         }
-        const margin = { top: 50, right: 5, bottom: 200, left: 30 }
+        const margin = { top: 50, right: 140, bottom: 200, left: 30 }
         const width = 1200 - margin.left - margin.right
         const height = 600 - margin.top - margin.bottom
 
@@ -197,13 +197,13 @@ const SkillsGender = () => {
             .style("opacity", "0");
 
         legend.append("rect")
-            .attr("x", width - 18)
+            .attr("x", width - 18 + margin.right)
             .attr("width", 18)
             .attr("height", 18)
             .style("fill", (d) => color(d));
 
         legend.append("text")
-            .attr("x", width - 24)
+            .attr("x", width - 24 + margin.right)
             .attr("y", 9)
             .attr("dy", ".35em")
             .style("text-anchor", "end")
