@@ -23,7 +23,7 @@ const WC = () => {
         ReactDOM.render(<div id="root"><WordCloud data={data} width={200} height={200} rotate={0} padding={0} /></div>, document.getElementById('render'),c)
       })
       .catch(err => {
-        console.error(err)
+        console.error(error)
         setError("unable to get data")
       })
   };
@@ -36,8 +36,8 @@ const WC = () => {
         .then(({ data }) => {
           setjobTitles(data.title)
         })
-        .catch(err => {
-          console.error(err)
+        .catch(error => {
+          console.error(error)
           setError("database is empty")
       })
   }, [])
@@ -52,8 +52,8 @@ const WC = () => {
       <div className= "dropdown" >
         <form onSubmit={submit} style={{ display:"flex"}}>
           <div className="form">
-            <select name="profession" value= {profession} className="form-control w-100" onChange={handleChange}>
-              <option disabled selected value> select an option </option>
+            <select name="profession" className="form-control w-100" onChange={handleChange}>
+              <option disabled > select an option </option>
               {
                 jobTitles.map((title)=>{
                   return(
