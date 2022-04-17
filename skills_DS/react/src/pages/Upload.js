@@ -87,19 +87,19 @@ const Upload = () => {
         <table className="table m-0">
           <tbody>
             <tr className="table-borderless">
-              <td colSpan={2}><h3>Upload your resume in pdf format</h3></td>
+              <td colSpan={2}><h3 data-testid="upload-header">Upload your resume in pdf format</h3></td>
             </tr>
             <tr>
               <td>
                 <div className="input-group">
                   <label className="input-group-btn w-100">
-                    <span className="btn btn-primary w-100">
-                      Browse File <input type="file" name="file" onChange={changeHandler} accept="application/pdf" style={{ display: "none" }} multiple />
+                    <span className="btn btn-primary w-100" data-testid="browse-header">
+                      Browse File <input type="file" name="file" data-testid="file-input" onChange={changeHandler} accept="application/pdf" style={{ display: "none" }} multiple />
                     </span>
                   </label>
                 </div>
               </td>
-              {selectedFile && <td><b>{selectedFileName}</b></td>}
+              {selectedFile && <td><b data-testid="file-name">{selectedFileName}</b></td>}
             </tr>
           </tbody>
         </table>
@@ -108,7 +108,7 @@ const Upload = () => {
       {pdfFile && (
         <div className="shadow p-3 mb-5 bg-white rounded">
           <div>
-            <button className="btn btn-success w-100" onClick={handleSubmission}>
+            <button data-testid="submit-button" className="btn btn-success w-100" onClick={handleSubmission}>
               Submit
             </button>
           </div>
