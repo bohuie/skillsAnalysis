@@ -158,17 +158,18 @@ class ResumeUploadView(APIView):
 		for skill in data['skills']:
 			skills.append(skill.strip())
 
+		#retrieve current user's skills
 		skillsCurrent = list(Profile.objects.filter(user=request.user).values_list('skills',flat=True))
-		y = json.loads(skillsCurrent[0])
+		skillsCurrent = json.loads(skillsCurrent[0])
 
-		if(len(y) > 0):
-			for skill in y:
-				if skill not in skills:
+		#appends new skills to list of user's old skills
+		if(len(skillsCurrent) > 0):
+			for skill in skillsCurrent:
+				if '' in skills:
+					skills.remove('')
+				elif skill not in skills:
 					skills.append(skill)
-
-		if '' in skills:
-			skills.remove('')
-			
+						
 		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
 		Profile.objects.filter(user = request.user).update(resume_processing = False)
 		
