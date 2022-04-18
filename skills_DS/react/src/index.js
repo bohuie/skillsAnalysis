@@ -10,6 +10,7 @@ import SkillsGender from "./pages/admin/SkillsGender"
 import SkillsYear from "./pages/admin/SkillsYear"
 import WordCloud from "./pages/WordCloud"
 import ViewSkills from "./pages/ViewSkills"
+import MatchJobs from "./pages/MatchJobs"
 
 ReactDOM.render(
   <React.StrictMode>
@@ -24,6 +25,7 @@ ReactDOM.render(
         <Route path="/admin/skills-gender" element={<SkillsGender />} />
         <Route path="/admin/skills-year" element={<SkillsYear />} />
         <Route path="/view-skills" element={<ViewSkills/>} />
+        <Route path="/match-jobs" element={<MatchJobs />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
