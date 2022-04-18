@@ -1,8 +1,11 @@
 env
 venv
 skills_DS/venv
+skills_DS/api/migrations
+skills_DS/base/migrations
 __pycache__/
 secrets.json
 docker/postgresql/data
 skills_DS/media
+.env
 .bash_profile.save

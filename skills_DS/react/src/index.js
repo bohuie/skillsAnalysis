@@ -6,8 +6,11 @@ import Upload from "./pages/Upload"
 import Profile from "./pages/Profile"
 import GetSkills from "./pages/admin/GetSkills"
 import BrowseSkills from "./pages/admin/BrowseSkills"
+import SkillsGender from "./pages/admin/SkillsGender"
+import SkillsYear from "./pages/admin/SkillsYear"
 import WordCloud from "./pages/WordCloud"
 import ViewSkills from "./pages/ViewSkills"
+import MatchJobs from "./pages/MatchJobs"
 
 ReactDOM.render(
   <React.StrictMode>
@@ -19,7 +22,10 @@ ReactDOM.render(
         <Route path="/word-cloud" element={<WordCloud/>} />
         <Route path="/admin/skills" element={<GetSkills />} />
         <Route path="/admin/browse-skills" element={<BrowseSkills />} />
+        <Route path="/admin/skills-gender" element={<SkillsGender />} />
+        <Route path="/admin/skills-year" element={<SkillsYear />} />
         <Route path="/view-skills" element={<ViewSkills/>} />
+        <Route path="/match-jobs" element={<MatchJobs />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
