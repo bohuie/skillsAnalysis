@@ -81,7 +81,7 @@ class GetUserProfileView(APIView):
 				profile["full_name"] = request.user.get_full_name()
 				profile["email"] = request.user.email
 				return Response({
-					"message" : "Retrived user profile",
+					"message" : "Successfully retrived user profile",
 					"profile": profile	
 				}, status=status.HTTP_200_OK)
 			else:
@@ -139,7 +139,7 @@ class ResumeUploadView(APIView):
 					t = threading.Thread(target=self.parse_resume_async,args=[fpath,curr_timestamp,request])
 					t.start()
 					return Response({
-						"message": "File uploaded, processing"
+						"message": "Successfully uploaded file, processing"
 					}, status=status.HTTP_200_OK)
 				else:
 					return Response({
@@ -237,4 +237,3 @@ class GetAllProfileView(APIView):
 			return Response({'success': profile}, status=status.HTTP_200_OK)
 		else:
 			return Response({'error': 'User not logged in.'}, status=status.HTTP_401_UNAUTHORIZED)
-	

@@ -56,19 +56,19 @@ const Questions = props => {
             <tbody>
               <tr className="table-borderless">
                 <td scope="col" colSpan="2">
-                  <h3>
+                  <h3 data-testid="welcome-header">
                     Welcome, please answer some questions.
                   </h3>
                 </td>
               </tr>
               <tr>
-                <td>What is your age?</td>
+                <td data-testid="age">What is your age?</td>
                 <td>
                   <input required type="number" id="q1" min="1" max="99" autoComplete="off" className="form-control" onChange={e => setAge(e.target.value)} />
                 </td>
               </tr>
               <tr>
-                <td>What is your gender?</td>
+                <td data-testid="gender">What is your gender?</td>
                 <td>
                   <select required className="form-control" id="q2" onChange={e => setGender(e.target.value)} defaultValue={''}>
                     <option disabled hidden value="" > select an option </option>
@@ -80,7 +80,7 @@ const Questions = props => {
                 </td>
               </tr>
               <tr>
-                <td>What is your year of study?</td>
+                <td data-testid="year">What is your year of study?</td>
                 <td>
                   <select required className="form-control" id="q3" onChange={e => setYearOfStudy(e.target.value)} defaultValue={''}>
                     <option disabled hidden value="" > select an option </option>
@@ -88,14 +88,13 @@ const Questions = props => {
                     <option value="Two">2</option>
                     <option value="Three">3</option>
                     <option value="Four">4</option>
-                    <option value="Five">5</option>
                     <option value="Fivep">5+</option>
                   </select>
                 </td>
               </tr>
               <tr>
                 <td scope="col" colSpan={2}>
-                  <button className="btn btn-primary w-100" type="submit">
+                  <button data-testid="submit-button" className="btn btn-primary w-100" type="submit">
                     Submit
                   </button>
                 </td>
