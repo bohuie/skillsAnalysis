@@ -63,14 +63,13 @@ class Profile(models.Model):
         Two = "2"
         Three = "3"
         Four = "4"
-        Five = "5"
         Fivep = "5+"
 
     user = models.OneToOneField(User,on_delete=models.CASCADE, related_name="profile")
     age = models.IntegerField(null=True)
     gender = models.CharField(choices=[(gender.name,gender.value) for gender in Gender],max_length=10)
     yearOfStudy = models.CharField(choices=[(year.name,year.value) for year in Year],max_length=10)
-    skills = models.TextField(default="[]")
+    skills = models.TextField(default="{}")
     resume_processing = models.BooleanField(default=False)
    
     def __str__(self):
