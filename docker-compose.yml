@@ -19,7 +19,7 @@ services:
       # Initialization script, might not be required
       - ./docker/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
-      POSTGRES_PASSWORD: example
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     networks:
       - django-network
     healthcheck:
@@ -39,6 +39,16 @@ services:
       - 8000:8000
     volumes:
       - ./skills_DS:/app/django
+    environment:
+      - DB_NAME
+      - DB_USER
+      - DB_PASSWORD
+      - DB_HOST
+      - DB_PORT
+      - RECAPTCHA_PUBLIC_KEY
+      - RECAPTCHA_PRIVATE_KEY
+      - EMAIL_HOST_USER
+      - EMAIL_HOST_PASSWORD
     networks:
       - django-network
     command: [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
@@ -49,6 +59,8 @@ services:
     restart: always
     volumes:
       - ./skills_DS/react:/app/react
+    environment:
+      - GOOGLE_MAPS_KEY
     networks:
       - django-network
     command: [ "npm", "start" ]

@@ -3,7 +3,7 @@ import ReactDOM from "react-dom"
 import WordCloud from "react-d3-cloud"
 import axios from "axios"
 import Cookies from "js-cookie"
-import {useState, Fragment, useEffect} from "react"
+import { useState, Fragment, useEffect } from "react"
 
 const WC = () => {
   const [jobTitles, setjobTitles] = useState([])
@@ -16,9 +16,9 @@ const WC = () => {
     var data
     e.preventDefault()
     axios
-      .post("/api/get-job-skills", {job}, {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}})
+      .post("/api/get-job-skills", { job }, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
       .then(s => {
-        data = s.data.skills.map(({name, count}) => ({text: name, value: count}))
+        data = s.data.skills.map(({ name, count }) => ({ text: name, value: count }))
         ReactDOM.render(
           <div id="root">
             <WordCloud data={data} width={200} height={200} rotate={0} padding={0} />
@@ -31,7 +31,7 @@ const WC = () => {
         )
       })
       .catch(err => {
-        console.error(err)
+        console.error(error)
         setError("unable to get data")
       })
   }
@@ -40,8 +40,8 @@ const WC = () => {
   }
   useEffect(() => {
     axios
-      .get("/api/get-job-titles", {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}})
-      .then(({data}) => {
+      .get("/api/get-job-titles", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
+      .then(({ data }) => {
         setjobTitles(data.title)
       })
       .catch(err => {
@@ -58,7 +58,7 @@ const WC = () => {
   return (
     <Fragment>
       <div className="dropdown">
-        <form onSubmit={submit} style={{display: "flex"}}>
+        <form onSubmit={submit} style={{ display: "flex" }}>
           <div className="form">
             <select name="profession" value={profession} className="form-control w-100" onChange={handleChange}>
               <option disabled selected value>

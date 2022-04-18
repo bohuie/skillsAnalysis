@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser
 from django.core.files.storage import FileSystemStorage
+from django.db.models import OuterRef, Subquery
 from resume_parser import resumeparse
 from datetime import datetime
 import hashlib
@@ -79,6 +80,7 @@ class GetUserProfileView(APIView):
 		if request.user.is_authenticated:
 			if Profile.objects.filter(user = request.user).exists():
 				profile = Profile.objects.filter(user = request.user).values()[0]
+				profile["skills"] = json.loads(profile["skills"])
 				profile["gender"] = Profile.Gender[profile["gender"]].value
 				profile["yearOfStudy"] = 1 
 				profile["full_name"] = request.user.get_full_name()
@@ -103,14 +105,21 @@ class UpdateUserSkillsView(APIView):
 				return Response({
 					"message": "User does not have a profile"
 				}, status=status.HTTP_400_BAD_REQUEST)
-			skills = request.data
+			skills = request.data['skills']
 			skills_array = [] 
 			for skill in skills:
 				skills_array.append(skill['value'])
-			Profile.objects.filter(user = request.user).update(skills = json.dumps(skills_array))
-			return Response({
+			current_skills = json.loads(Profile.objects.filter(user = request.user).values()[0]['skills'])
+			if (request.data['timestamp'] in current_skills):
+				current_skills[request.data['timestamp']] = skills_array
+				Profile.objects.filter(user = request.user).update(skills = json.dumps(current_skills))
+				return Response({
 					"message" : "Successfully updated skills.",
 				}, status=status.HTTP_200_OK)
+			else:
+				return Response({
+					"message": "Non exsisting key."
+				}, status=status.HTTP_400_BAD_REQUEST)
 		else:
 			return Response({
 					"message": "User not logged in."
@@ -126,12 +135,13 @@ class ResumeUploadView(APIView):
 			try:
 				current_user = request.user
 				fs = FileSystemStorage()
-				fname = hashlib.sha256(current_user.email.encode()).hexdigest() + "_" + datetime.now().strftime('%m-%d-%Y_%H-%M-%S') + ".pdf"
+				curr_timestamp = str(int(datetime.now().timestamp()))
+				fname = hashlib.md5(current_user.email.encode()).hexdigest() + "_" + curr_timestamp + ".pdf"
 				fs.save(fname, file_obj)
 				fpath = fs.path(fname)
 				logging.debug("Recieved file: " + fpath)
 				if Profile.objects.filter(user = request.user).exists():
-					t = threading.Thread(target=self.parse_resume_async,args=[fpath,request])
+					t = threading.Thread(target=self.parse_resume_async,args=[fpath,curr_timestamp,request])
 					t.start()
 					return Response({
 						"message": "File uploaded, processing"
@@ -151,7 +161,7 @@ class ResumeUploadView(APIView):
 				"message": "Empty request"
 			}, status=status.HTTP_400_BAD_REQUEST)
 
-	def parse_resume_async(v, path, request):
+	def parse_resume_async(v, path, curr_timestamp, request):
 		Profile.objects.filter(user = request.user).update(resume_processing = True)
 		
 		#logging.debug("Parsing...")
@@ -162,8 +172,9 @@ class ResumeUploadView(APIView):
 		skills = []
 		for skill in data['skills']:
 			skills.append(skill.strip())
-
-		Profile.objects.filter(user = request.user).update(skills = json.dumps(skills))
+		current_skills = json.loads(Profile.objects.filter(user = request.user).values()[0]['skills'])
+		current_skills[curr_timestamp] = skills
+		Profile.objects.filter(user = request.user).update(skills = json.dumps(current_skills))
 		Profile.objects.filter(user = request.user).update(resume_processing = False)
 		
 class CheckUserView(APIView):
@@ -190,6 +201,17 @@ class GetJobSkillView(APIView):
 		else:
 			print(request.data)
 			return Response({'error': 'bad request'}, status=status.HTTP_400_BAD_REQUEST)
+	
+	def get(self, request):
+		top_skills_per_job = Skill.objects.filter(
+    			job_title_id=OuterRef('job_title_id'),
+				verified = True
+			).order_by('-count')[:20]
+		top_skills = Skill.objects.filter(
+				id__in=Subquery(top_skills_per_job.values('id'))
+			).values('name','count', 'job_title__name') 
+		return Response({'skills': top_skills},status=status.HTTP_200_OK)	
+
 
 class GetAllProfileView(APIView):
 	def get(self, request, format=None):
