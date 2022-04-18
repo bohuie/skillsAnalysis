@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'captcha',
+    'django_extensions',
     'api.apps.ApiConfig',
     'base.apps.BaseConfig',
     'base.apps.CustomAdminConfig',
