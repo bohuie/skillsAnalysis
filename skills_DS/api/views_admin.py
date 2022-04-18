@@ -39,7 +39,7 @@ class ScrapeJobsView(APIView):
                                  position, location, num, country, remote, radius])
             t.start()
             return Response({
-                    'message': 'Job scraping started'
+                    'message': 'Successfully started job scraping.'
                 }, status=status.HTTP_200_OK)
         else:
             return Response({
@@ -197,7 +197,7 @@ class ExtractSkillsView(APIView):
                 t.start()
 
                 return Response({
-                            "message": "Extracting skills",
+                            "message": "Successfully started extracting skills",
                             "num_jobs": len(jobs)
                         }, status=status.HTTP_200_OK)
 
