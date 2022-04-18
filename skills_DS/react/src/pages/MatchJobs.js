@@ -2,7 +2,6 @@ import axios from "axios"
 import {useState, useEffect, Fragment} from "react"
 import Cookies from "js-cookie"
 import professions from "professions"
-import {googleMapsKey} from "../secrets.json"
 import Alert from "../components/Alert"
 
 const MatchJobs = () => {
@@ -17,7 +16,7 @@ const MatchJobs = () => {
     setLoading(true)
     let {position, location, radius, remote} = event.target.elements
     axios
-      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${googleMapsKey}`)
+      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${process.env.GOOGLE_MAPS_KEY}`)
       .then(({data: {results}}) => {
         if (results.length === 0) throw "Could not get location"
         let {address_components} = results[0]
