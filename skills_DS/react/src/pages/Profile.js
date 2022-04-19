@@ -53,7 +53,7 @@ const Profile = props => {
             ))
         );
     }
-    
+
     const handleSubmit = (event) => {
         event.preventDefault();
         axios.post("/api/update-user-skills", { 'timestamp': selected_version.timestamp, 'skills': skills }, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
@@ -146,6 +146,7 @@ const Profile = props => {
                 </table>
             </div>
 
+
             <div className="shadow p-3 mb-5 bg-white rounded">
                 <form onSubmit={handleSubmit}>
                     <table className="table">
@@ -161,7 +162,7 @@ const Profile = props => {
                                             {
                                                 versions.map((v, index) => {
                                                     return (
-                                                        <button className="dropdown-item" type="button" onClick={() => handleVersionChange(v)}>
+                                                        <button className="dropdown-item" type="button" onClick={() => handleVersionChange(v)} key={v.version}>
                                                             {"v" + v.version + " - " + new Date(v.timestamp * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                                                         </button>
                                                     )
