@@ -6,5 +6,6 @@ urlpatterns = [
     re_path(r"^profile\/?$", views.profile_required_view, name="user_profile"),
     re_path(r"^word-cloud\/?$", views.word_cloud),
     re_path(r"^view-skills\/?$", views.word_cloud),
+    re_path(r"^skills-jobs\/?$", views.login_required_view, name="skills_jobs"),
     re_path(r"^.*", views.index) 
 ]

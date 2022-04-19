@@ -220,7 +220,7 @@ class GetSkillsInformation(APIView):
 		top_skills_per_job = Skill.objects.filter(
     			job_title_id=OuterRef('job_title_id'),
 				verified = True
-			).order_by('-count')[:20]
+			).order_by('-count')[:10]
 		top_skills = Skill.objects.filter(
 				id__in=Subquery(top_skills_per_job.values('id'))
 			).values('name','count', 'job_title__name') 

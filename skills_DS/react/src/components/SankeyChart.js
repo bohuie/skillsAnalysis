@@ -1,6 +1,6 @@
 import React from "react";
 import * as d3 from "d3";
-import * as d3Sankey from "d3-sankey"; 
+import * as d3Sankey from "d3-sankey";
 
 //const d3Sankey = require.alias({ "d3-array": d3, "d3-shape": d3, "d3-sankey": "d3-sankey@0.12.3/dist/d3-sankey.min.js" })("d3-sankey");
 const SankeyChart = ({
@@ -37,8 +37,10 @@ const SankeyChart = ({
     marginBottom = 5, // bottom margin, in pixels
     marginLeft = 1, // left margin, in pixels
 } = {}) => {
-    const svgRef = React.useRef(null);
+    if (links.length < 1 || links[0].source == null) return <svg width={width} height={height} />;
     
+    const svgRef = React.useRef(null);
+
     React.useEffect(() => {
         const svgEl = d3.select(svgRef.current);
         svgEl.selectAll("*").remove(); // Clear svg content before adding new elements 

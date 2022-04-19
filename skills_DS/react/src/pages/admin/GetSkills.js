@@ -15,12 +15,15 @@ const GetSkills = props => {
   const dismissAlert = () => {
     setAlert({ visible: false })
   }
+  
+  const REACT_APP_GOOGLE_MAPS_KEY = "AIzaSyDXcZrBQloC9mdrUbmKrLo9Q8AqfI1ifs8";
 
   const scrapeJobs = event => {
     event.preventDefault()
     let { position, number, remote, location, radius } = event.target.elements
+    console.log(process.env.REACT_APP_GOOGLE_MAPS_KEY);
     axios
-      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${process.env.GOOGLE_MAPS_KEY}`)
+      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${REACT_APP_GOOGLE_MAPS_KEY}`)
       .then(({ data: { results } }) => {
         if (results.length === 0) throw "Could not get location"
         let { address_components } = results[0]
@@ -97,7 +100,7 @@ const GetSkills = props => {
     setExtractError(null)
     let {extractPosition, extractLocation, distance} = event.target.elements
     axios
-      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${extractLocation.value}&key=${process.env.GOOGLE_MAPS_KEY}`)
+      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${extractLocation.value}&key=${REACT_APP_GOOGLE_MAPS_KEY}`)
       .then(({data: {results}}) => {
         if (results.length === 0) throw "Could not get location"
         let {address_components} = results[0]

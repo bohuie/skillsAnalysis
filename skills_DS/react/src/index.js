@@ -9,6 +9,7 @@ import BrowseSkills from "./pages/admin/BrowseSkills"
 import SkillsGender from "./pages/admin/SkillsGender"
 import SkillsYear from "./pages/admin/SkillsYear"
 import WordCloud from "./pages/WordCloud"
+import SkillsJobs from "./pages/SkillsJobs"
 import ViewSkills from "./pages/ViewSkills"
 
 ReactDOM.render(
@@ -19,6 +20,7 @@ ReactDOM.render(
         <Route path="/upload" element={<Upload />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/word-cloud" element={<WordCloud/>} />
+        <Route path="/skills-jobs" element={<SkillsJobs/>} />
         <Route path="/admin/skills" element={<GetSkills />} />
         <Route path="/admin/browse-skills" element={<BrowseSkills />} />
         <Route path="/admin/skills-gender" element={<SkillsGender />} />
