@@ -43,6 +43,10 @@ LOGGING = {
         'level': 'DEBUG',
     },
 }
+# Cron jobs (12am daily)
+CRONJOBS = [
+    ('0 0 * * *', 'scripts.seed_database.job_schedule')
+]
 
 # Application definition
 
@@ -55,6 +59,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'crispy_forms',
     'captcha',
+    'django_crontab',
+    'scripts',
     'api.apps.ApiConfig',
     'base.apps.BaseConfig',
     'base.apps.CustomAdminConfig',
