@@ -16,7 +16,7 @@ const GetSkills = props => {
     setAlert({ visible: false })
   }
   
-  const REACT_APP_GOOGLE_MAPS_KEY = "AIzaSyDXcZrBQloC9mdrUbmKrLo9Q8AqfI1ifs8";
+  const REACT_APP_GOOGLE_MAPS_KEY = "REPLACE WITH KEY";
 
   const scrapeJobs = event => {
     event.preventDefault()
