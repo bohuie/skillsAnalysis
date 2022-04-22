@@ -63,7 +63,7 @@ services:
       - GOOGLE_MAPS_KEY
     networks:
       - django-network
-    command: [ "npm", "start" ]
+    command: "npx webpack --mode development --watch --env REACT_APP_GOOGLE_MAPS_KEY=${REACT_APP_GOOGLE_MAPS_KEY}"
 
 networks:
   django-network:

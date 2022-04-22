@@ -20,7 +20,7 @@ const GetSkills = props => {
     event.preventDefault()
     let { position, number, remote, location, radius } = event.target.elements
     axios
-      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${process.env.GOOGLE_MAPS_KEY}`)
+      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${process.env.REACT_APP_GOOGLE_MAPS_KEY}`)
       .then(({ data: { results } }) => {
         if (results.length === 0) throw "Could not get location"
         let { address_components } = results[0]
@@ -92,19 +92,19 @@ const GetSkills = props => {
       })
   }
 
-   const extractSkills = event => {
+  const extractSkills = event => {
     event.preventDefault()
     setExtractError(null)
-    let {extractPosition, extractLocation, distance} = event.target.elements
+    let { extractPosition, extractLocation, distance } = event.target.elements
     axios
-      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${extractLocation.value}&key=${process.env.GOOGLE_MAPS_KEY}`)
-      .then(({data: {results}}) => {
+      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${extractLocation.value}&key=${process.env.REACT_APP_GOOGLE_MAPS_KEY}`)
+      .then(({ data: { results } }) => {
         if (results.length === 0) throw "Could not get location"
-        let {address_components} = results[0]
+        let { address_components } = results[0]
         let loc = address_components.find(ac => ac.types.includes("sublocality"))?.long_name || address_components.find(ac => ac.types.includes("locality"))?.long_name + " " + address_components.find(ac => ac.types.includes("administrative_area_level_1")).long_name
-        return axios.post("/api/get-skills", {position: extractPosition.value, location: {name: loc, ...results[0].geometry.location}, distance: distance.value}, {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}})
+        return axios.post("/api/get-skills", { position: extractPosition.value, location: { name: loc, ...results[0].geometry.location }, distance: distance.value }, { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
       })
-      .then(({data}) => {
+      .then(({ data }) => {
         console.log(data)
         setAlert({
           visible: true,
@@ -133,7 +133,7 @@ const GetSkills = props => {
 
   const checkExtractProgress = () => {
     axios
-      .get("/api/get-skills", {headers: {"X-CSRFTOKEN": Cookies.get("csrftoken")}})
+      .get("/api/get-skills", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
       .then(response => {
         let progress = response.data.progress
         console.log(response)

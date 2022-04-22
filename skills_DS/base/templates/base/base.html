@@ -44,6 +44,11 @@
             <a class="nav-link" href="/view-skills">View skills</a>
           </li>
           {% endif %}
+          {% if user.is_authenticated %}
+          <li class="nav-item active">
+            <a class="nav-link" href="/skills-jobs">Skills&Jobs Visualization</a>
+          </li>
+          {% endif %}
         </ul>
 
         {% if user.is_authenticated %}
