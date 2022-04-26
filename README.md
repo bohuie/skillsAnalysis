@@ -47,6 +47,25 @@ docker-compose up
 
 to start all containers. Then navigate to `localhost:8000` to view the webpage.
 
+To run script execute the following code in docker command line:
+```console
+python manage.py runscript -v2 seed_database
+```
+
+Next, add job to cron by executing:
+```console
+python manage.py crontab add
+```
+
+Then, start cron by executing:
+```console
+service cron start
+```
+
+To ensure cron has started, execute:
+```console
+service cron status
+```
 **Note: If you at any point added or removed any dependencies from React or Django, you will have to re-build the docker images. Follow the First time setup guide on how to build the images. If Django model is modified, you will have to re-initialize the database as well.**
 
 ## Permissions
