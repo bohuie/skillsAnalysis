@@ -7,6 +7,7 @@ COPY migrate.sh /app/django
 
 RUN apt update -y
 RUN apt install dos2unix default-jdk -y
+RUN apt-get install -y cron
 
 RUN pip3 install --upgrade pip setuptools wheel
 RUN pip3 install -r requirements.txt

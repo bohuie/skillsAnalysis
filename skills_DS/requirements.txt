@@ -19,3 +19,5 @@ sqlparse==0.4.2
 tzdata==2021.5
 urllib3==1.26.8
 importlib-metadata==3.2.0
+django-extensions
+django-crontab
