@@ -36,7 +36,10 @@ docker-compose up
 to start all Docker containers. There **WILL** be errors. Ignore them for now. After all containers has been started and initialize, open Docker Desktop and navigate to `Containers/Apps -> skillsanalysis -> django  -> CLI`. A console window will show up. In it, execute:
 
 ```console
-./migrate.sh
+python manage.py makemigrations base
+python manage.py makemigrations api
+python manage.py makemigrations
+python manage.py migrate
 ```
 
 This will initialize the database. After this is done, close the console window for Django. In the original console window where you started Docker, use `ctrl+c` to stop all of them.
