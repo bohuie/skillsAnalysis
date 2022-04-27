@@ -10,7 +10,7 @@ const Profile = props => {
         message: ""
     });
     const [versions, setVersions] = useState([]);
-    const [selected_version, setSelectedVersion] = useState('');
+    const [selected_version, setSelectedVersion] = useState(false);
     const [skills, setSkills] = useState([]);
     const [profile, setProfile] = useState({
         full_name: '',
@@ -96,11 +96,13 @@ const Profile = props => {
                     return { version: index + 1, timestamp: val }
                 });
                 setVersions(versions);
-                setSelectedVersion(versions[0]);
-                temp_skills = r_profile.skills[versions[0].timestamp].map((skill, index) => (
-                    { id: index, value: skill }
-                ));
-                setSkills(temp_skills);
+                if (versions.length > 0) {
+                    setSelectedVersion(versions[0]);
+                    temp_skills = r_profile.skills[versions[0].timestamp].map((skill, index) => (
+                        { id: index, value: skill }
+                    ));
+                    setSkills(temp_skills);
+                }
             })
             .catch((error) => {
                 console.error(error);
@@ -148,65 +150,73 @@ const Profile = props => {
 
 
             <div className="shadow p-3 mb-5 bg-white rounded">
-                <form onSubmit={handleSubmit}>
-                    <table className="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">{"Skills - Resume v" + selected_version.version}</th>
-                                <th scope="col">
-                                    <div className="dropdown form-check w-100">
-                                        <button className="btn btn-primary dropdown-toggle w-100" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
-                                            Select resume version
-                                        </button>
-                                        <div className="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
-                                            {
-                                                versions.map((v, index) => {
-                                                    return (
-                                                        <button className="dropdown-item" type="button" onClick={() => handleVersionChange(v)} key={v.version}>
-                                                            {"v" + v.version + " - " + new Date(v.timestamp * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                                        </button>
-                                                    )
-                                                })
-                                            }
+                {selected_version ?
+                    (<form onSubmit={handleSubmit}>
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">{"Skills - Resume v" + selected_version.version}</th>
+                                    <th scope="col">
+                                        <div className="dropdown form-check w-100">
+                                            <button className="btn btn-primary dropdown-toggle w-100" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                                                Select resume version
+                                            </button>
+                                            <div className="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
+                                                {
+                                                    versions.map((v, index) => {
+                                                        return (
+                                                            <button className="dropdown-item" type="button" onClick={() => handleVersionChange(v)} key={v.version}>
+                                                                {"v" + v.version + " - " + new Date(v.timestamp * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                                            </button>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
                                         </div>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                skills.map((skill) => {
-                                    return (
-                                        <tr key={skill.id}>
-                                            <td>
-                                                <div className="form-check w-100">
-                                                    <input type="text" className="form-control" onChange={(event) => handleEdit(event, skill.id)} value={skill.value} required></input>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div className="form-check w-100">
-                                                    <button type="button" className="btn btn-danger w-100" onClick={() => handleDeleteRow(skill.id)}>Delete</button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    )
-                                })
-                            }
-                            <tr>
-                                <td>
-                                    <div className="form-check w-100">
-                                        <button type="button" className="btn btn-primary w-100" onClick={handleAddRow}>Add a skill</button>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div className="form-check w-100">
-                                        <button type="submit" className="btn btn-success w-100">Submit</button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </form>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {
+                                    skills.map((skill) => {
+                                        return (
+                                            <tr key={skill.id}>
+                                                <td>
+                                                    <div className="form-check w-100">
+                                                        <input type="text" className="form-control" onChange={(event) => handleEdit(event, skill.id)} value={skill.value} required></input>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div className="form-check w-100">
+                                                        <button type="button" className="btn btn-danger w-100" onClick={() => handleDeleteRow(skill.id)}>Delete</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })
+                                }
+                                <tr>
+                                    <td>
+                                        <div className="form-check w-100">
+                                            <button type="button" className="btn btn-primary w-100" onClick={handleAddRow}>Add a skill</button>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="form-check w-100">
+                                            <button type="submit" className="btn btn-success w-100">Submit</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                    )
+                    :
+                    (
+                        <h3>Upload your resume to see your skills!</h3>
+                    )
+                }
+
             </div>
         </Fragment >
     )
