@@ -60,10 +60,11 @@ def run():
             #extract skill
             extract = ExtractSkillsView()
             titles = JobTitle.objects.filter(name=joblist[i].lower())
-            title = titles[0]
-            (x1, x2, y1, y2) = extract.get_coordinates(maps, dist)
-            jobs = JobPosting.objects.filter(location__lat__gte=x1, location__lat__lte=x2, location__lng__gte=y1, location__lng__lte=y2, job_title=title)
-            extract.extract_skills(jobs,title,maps)
+            if (len(titles) > 0):
+                title = titles[0]
+                (x1, x2, y1, y2) = extract.get_coordinates(maps, dist)
+                jobs = JobPosting.objects.filter(location__lat__gte=x1, location__lat__lte=x2, location__lng__gte=y1, location__lng__lte=y2, job_title=title)
+                extract.extract_skills(jobs,title,maps)
 
 def job_schedule():
     run()
