@@ -56,7 +56,7 @@ class ScrapeJobsView(APIView):
     def scrape_jobs(self, position, location, num, country, remote, radius):
         try:
             records = []
-            url = self.get_url(self=self,position=position, location=location['name'], country=country, radius=radius)
+            url = self.get_url(position=position, location=location['name'], country=country, radius=radius)
             i = 0
             while num > i:
                 ScrapeJobsView.progress["num_scraped"] = i
@@ -97,7 +97,7 @@ class ScrapeJobsView(APIView):
                 reqs = [session.get(url, headers=headers) for url in urls]
                 for index, req in enumerate(reqs):
                     resp = req.result()
-                    record = self.get_record(self=self, page=resp.content)
+                    record = self.get_record(page=resp.content)
                     if record is not None:
                         records.append(record + (urls[index],))
                         
@@ -306,7 +306,7 @@ class ListSkillsView(ListAPIView):
 class UpdateSkillsView(APIView):
     permission_classes = [IsAdminUser]
 
-    def get(self, request):
+    def post(self, request):
         skills = request.data
         for skill in skills:
             job_title = JobTitle.objects.filter(name=skill['job_title'])

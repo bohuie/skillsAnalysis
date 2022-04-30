@@ -103,7 +103,7 @@ const BrowseSkills = props => {
 
                     <td>
                       <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name={skill} id={"invalid:" + skill} value={"invalid:" + skill} checked />
+                        <input class="form-check-input" type="radio" name={skill} id={"invalid:" + skill} value={"invalid:" + skill} />
                         <label class="form-check-label" for={"invalid:" + skill}>
                           Invalid
                         </label>
