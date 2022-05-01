@@ -19,7 +19,7 @@ const BrowseSkills = props => {
     setAlert({
       visible: true,
       type: "success",
-      message: <span>Fetching Skills...&nbsp;&nbsp;<span class="spinner-border spinner-border-sm text-success" role="status"></span></span>
+      message: <span>Fetching Skills...&nbsp;&nbsp;<span className="spinner-border spinner-border-sm text-success" role="status"></span></span>
     });
     axios
       .get("/api/list-skills", { headers: { "X-CSRFTOKEN": Cookies.get("csrftoken") } })
@@ -75,7 +75,7 @@ const BrowseSkills = props => {
         handleDismiss={dismissAlert}
       />
 
-      <div class="shadow p-3 mb-5 bg-white rounded">
+      <div className="shadow p-3 mb-5 bg-white rounded">
         <form onSubmit={handleSubmission}>
           <table className="table">
             <thead>
@@ -93,26 +93,26 @@ const BrowseSkills = props => {
                 return (
                   <tr key={idx}>
                     <td>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name={skill} id={"good:" + skill} value={"good:" + skill} />
-                        <label class="form-check-label" for={"good:" + skill}>
+                      <div className="form-check form-check-inline">
+                        <input className="form-check-input" type="radio" name={skill} id={"good:" + skill} value={"good:" + skill} />
+                        <label className="form-check-label" htmlFor={"good:" + skill}>
                           Valid
                         </label>
                       </div>
                     </td>
 
                     <td>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name={skill} id={"invalid:" + skill} value={"invalid:" + skill} />
-                        <label class="form-check-label" for={"invalid:" + skill}>
+                      <div className="form-check form-check-inline">
+                        <input className="form-check-input" type="radio" name={skill} id={"invalid:" + skill} value={"invalid:" + skill} defaultChecked />
+                        <label className="form-check-label" htmlFor={"invalid:" + skill}>
                           Invalid
                         </label>
                       </div>
                     </td>
                     <td>
-                      <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name={skill} id={"invalid2:" + skill} value={"invalid2:" + skill} />
-                        <label class="form-check-label" for={"invalid2:" + skill}>
+                      <div className="form-check form-check-inline">
+                        <input className="form-check-input" type="radio" name={skill} id={"invalid2:" + skill} value={"invalid2:" + skill} />
+                        <label className="form-check-label" htmlFor={"invalid2:" + skill}>
                           Invalid for job
                         </label>
                       </div>
