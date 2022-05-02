@@ -16,7 +16,7 @@ const MatchJobs = () => {
     setLoading(true)
     let {position, location, radius, remote} = event.target.elements
     axios
-      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${process.env.GOOGLE_MAPS_KEY}`)
+      .get(`https://maps.googleapis.com/maps/api/geocode/json?address=${location.value}&key=${process.env.REACT_APP_GOOGLE_MAPS_KEY}`)
       .then(({data: {results}}) => {
         if (results.length === 0) throw "Could not get location"
         let {address_components} = results[0]
